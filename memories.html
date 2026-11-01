@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Little Memories</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>Little memories</h1>
+      <p>Moments that made life a bit brighter. Tap any photo to see it big.</p>
+    </div>
+    <div class="gallery" id="gallery"></div>
+
+    <div class="next-link"><a href="openwhen.html" class="btn">Next: Open When ✉️</a></div>
+  </main>
+
+  <footer>more memories loading… 🌷</footer>
+
+  <div class="lightbox" id="lightbox">
+    <img id="lb-img" alt="" />
+    <p id="lb-cap"></p>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    // ✏️ Put photos in the images/ folder and list them here with a caption.
+    // Any file that's missing shows a cute placeholder instead.
+    const photos = [
+      ["images/photo2.jpg", "sunshine in a yellow hoodie 🌼"],
+      ["images/photo8.jpg", "saree day = slay day 💙"],
+      ["images/photo3.jpg", "flowers in her hair 🌸"],
+      ["images/photo9.jpg", "red looks unfair on you ❤️"],
+      ["images/photo5.jpg", "making wishes with lanterns 🏮"],
+      ["images/photo6.jpg", "blooming, just like the flowers 🌺"],
+      ["images/photo7.jpg", "even as a sketch, you're art ✏️"],
+      ["images/photo12.jpg", "under the fairy lights ✨"],
+      ["images/photo1.jpg", "mirror selfie queen 🤳"],
+      ["images/photo4.jpg", "night lights & quiet thoughts 🌙"],
+      ["images/photo11.jpg", "main character energy 🎬"],
+      ["images/photo10.jpg", "elevator selfie but make it iconic 🖤"],
+      ["images/photo14.jpg", "lost in twinkle lights 🌳"],
+      ["images/photo13.jpg", "city nights 🌃"],
+      ["images/photo15.jpg", "dressed up & glowing 💫"]
+    ];
+
+    const gallery = document.getElementById("gallery");
+    const lb = document.getElementById("lightbox");
+    photos.forEach(([src, caption], i) => {
+      const fig = document.createElement("figure");
+      fig.className = "polaroid";
+      const img = new Image();
+      img.src = src;
+      img.alt = caption;
+      img.onerror = () => {
+        img.replaceWith(Object.assign(document.createElement("div"), {
+          className: "ph",
+          innerHTML: `<div><b>📷</b>add ${src}</div>`
+        }));
+        fig.style.cursor = "default";
+        fig.dataset.empty = 1;
+      };
+      fig.appendChild(img);
+      const cap = document.createElement("figcaption");
+      cap.textContent = caption;
+      fig.appendChild(cap);
+      fig.addEventListener("click", () => {
+        if (fig.dataset.empty) return;
+        document.getElementById("lb-img").src = src;
+        document.getElementById("lb-cap").textContent = caption;
+        lb.classList.add("open");
+      });
+      gallery.appendChild(fig);
+    });
+    lb.addEventListener("click", () => lb.classList.remove("open"));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") lb.classList.remove("open"); });
+  </script>
+</body>
+</html>

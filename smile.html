@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smile Zone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>The Smile Zone</h1>
+      <p>Warning: side effects may include giggling. 😄</p>
+    </div>
+
+    <div class="smile-grid">
+      <div class="box">
+        <h2>Mood check 🌡️</h2>
+        <p>How are you feeling right now?</p>
+        <div class="mood-face" id="face">😐</div>
+        <input type="range" min="0" max="4" value="2" class="mood" id="mood" />
+        <div class="out" id="moodOut">Slide it. Be honest. 🙂</div>
+      </div>
+
+      <div class="box">
+        <h2>Compliment machine 💐</h2>
+        <div class="out" id="compOut">Press the button. You know you want to.</div>
+        <button class="btn" id="compBtn">Gimme one ✨</button>
+      </div>
+
+      <div class="box">
+        <h2>Terrible jokes 🤡</h2>
+        <div class="out" id="jokeOut">Guaranteed to be bad. Or your money back.</div>
+        <button class="btn" id="jokeBtn">Tell me one 😂</button>
+      </div>
+
+      <div class="box">
+        <h2>Pop the stress 🫧</h2>
+        <p>Pop the bubbles. Each one is a worry. Bye bye.</p>
+        <div class="bubble-area" id="bubbles"></div>
+        <p class="score" id="score">Worries popped: 0</p>
+      </div>
+
+      <div class="box">
+        <h2>Free hugs 🫂</h2>
+        <p>Tap the bear for a virtual hug. Unlimited supply.</p>
+        <button class="hug-btn" id="hug">🧸</button>
+        <div class="out" id="hugOut" style="min-height:50px">0 hugs received</div>
+      </div>
+    </div>
+
+    <div class="next-link"><a href="letter.html" class="btn">Last one: A Letter 💗</a></div>
+  </main>
+
+  <footer>smiling yet? 👀</footer>
+
+  <script src="main.js"></script>
+  <script>
+    const pick = (arr, last) => { let x; do { x = arr[Math.floor(Math.random() * arr.length)]; } while (arr.length > 1 && x === last); return x; };
+    const swap = (el, text) => { el.classList.remove("swap"); void el.offsetWidth; el.textContent = text; el.classList.add("swap"); };
+
+    // Mood
+    const faces = ["😢", "😕", "😐", "🙂", "😄"];
+    const moodLines = [
+      "Aww 🥺 Go open the 'you feel sad' letter. And then text me, okay?",
+      "Not great, huh? Pop some bubbles below. It helps. Trust me.",
+      "Meh is valid. Let's see if a bad joke can push it up a notch.",
+      "Ooh, getting there! That smile looks good on you.",
+      "YESSS! This is the Simran we love to see 🎉"
+    ];
+    const mood = document.getElementById("mood");
+    mood.addEventListener("input", () => {
+      document.getElementById("face").textContent = faces[mood.value];
+      document.getElementById("moodOut").textContent = moodLines[mood.value];
+    });
+
+    // Compliments
+    const compliments = [
+      "You have the kind of smile people remember. 😊",
+      "You're the human version of a warm cup of chai on a rainy day. ☕",
+      "You're way cooler than you give yourself credit for.",
+      "Your vibe? Immaculate. ✨",
+      "If you were a vegetable, you'd be a cute-cumber. 🥒",
+      "Anyone who has you in their life is lucky. Seriously.",
+      "You're stronger than whatever you're going through.",
+      "You make people feel comfortable just by being you.",
+      "Your laugh deserves its own Spotify playlist. 🎶",
+      "You're glowing. Even if you don't feel like it today. 🌟",
+      "Plot twist: you're the main character. Always were.",
+      "10/10. No notes. 💯"
+    ];
+    let lastComp;
+    document.getElementById("compBtn").addEventListener("click", () => {
+      lastComp = pick(compliments, lastComp);
+      swap(document.getElementById("compOut"), lastComp);
+    });
+
+    // Jokes
+    const jokes = [
+      "Why don't eggs tell jokes? They'd crack each other up. 🥚",
+      "What do you call a fake noodle? An impasta. 🍝",
+      "Why did the math book look sad? It had too many problems. 📚",
+      "What do you call a sleeping dinosaur? A dino-snore. 🦖",
+      "Why can't you trust atoms? They make up everything. ⚛️",
+      "What did the ocean say to the beach? Nothing, it just waved. 🌊",
+      "Why did the cookie go to the doctor? It felt crummy. 🍪",
+      "What's a cat's favourite colour? Purr-ple. 🐱",
+      "Why do bees have sticky hair? Because they use honeycombs. 🐝",
+      "What did one wall say to the other? I'll meet you at the corner. 🧱",
+      "I told my wifi we needed to talk. Now it won't connect with me. 📶"
+    ];
+    let lastJoke;
+    document.getElementById("jokeBtn").addEventListener("click", () => {
+      lastJoke = pick(jokes, lastJoke);
+      swap(document.getElementById("jokeOut"), lastJoke);
+    });
+
+    // Bubbles
+    const area = document.getElementById("bubbles");
+    let popped = 0;
+    const popMsgs = { 10: "10 worries gone! 🎉", 25: "25?! You're a pro now 💪", 50: "50! Stress level: zero 🧘‍♀️" };
+    function spawnBubble() {
+      const b = document.createElement("div");
+      b.className = "bubble";
+      const size = 34 + Math.random() * 40;
+      b.style.width = b.style.height = size + "px";
+      b.style.left = Math.random() * (area.clientWidth - size) + "px";
+      b.style.top = area.clientHeight + "px";
+      const dur = 4 + Math.random() * 4;
+      b.style.animationDuration = dur + "s";
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (b.classList.contains("popped")) return;
+        b.classList.add("popped");
+        popped++;
+        document.getElementById("score").textContent = popMsgs[popped] || `Worries popped: ${popped}`;
+        setTimeout(() => b.remove(), 250);
+      });
+      area.appendChild(b);
+      setTimeout(() => b.remove(), dur * 1000);
+    }
+    setInterval(spawnBubble, 650);
+
+    // Hugs
+    let hugs = 0;
+    const hugMsgs = ["*squeeze* 🤗", "another one! 🫂", "biggest hug ever 💗", "hug level: bear 🐻", "okay you clearly needed these 🥺", "infinite hugs unlocked ♾️"];
+    document.getElementById("hug").addEventListener("click", () => {
+      hugs++;
+      swap(document.getElementById("hugOut"), `${hugs} hug${hugs > 1 ? "s" : ""} received — ${hugMsgs[Math.min(Math.floor(hugs / 3), hugMsgs.length - 1)]}`);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Letter For You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>One last thing…</h1>
+      <p id="hint">Tap the envelope 💌</p>
+    </div>
+
+    <div class="big-env-wrap">
+      <div class="big-env" id="env"><div class="heart-seal">💗</div></div>
+
+      <!-- ✏️ Write this one yourself. It's the most important page. -->
+      <div class="final-letter" id="letter">
+        <div class="letter-paper">
+          <h2>Dear Simran,</h2>
+          <p>I know things have been really hard lately. And I just wanted you to know that it's okay to not be okay for a while.</p>
+          <p>I made this little website because I couldn't stand the thought of you feeling sad and thinking nobody notices. I notice. And I care — a lot.</p>
+          <p>You're kind, you're funny, you're beautiful (inside and out), and you deserve someone who never makes you doubt any of that. Please don't let one chapter make you forget how amazing the whole book is.</p>
+          <p>No pressure, no expectations. I just want you to smile again. Whenever you want to talk, rant, cry, or just send memes at 3am — I'm here. Always.</p>
+          <p>Take your time healing. The world's waiting for that smile to come back. 🌷</p>
+          <p class="sign">— always in your corner,<br />Dhruv ♡</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-link" id="back" style="display:none">
+      <a href="index.html" class="btn ghost">Back to the start 🏠</a>
+    </div>
+  </main>
+
+  <footer>♡</footer>
+
+  <script src="main.js"></script>
+  <script>
+    const env = document.getElementById("env");
+    env.addEventListener("click", () => {
+      if (env.classList.contains("open")) return;
+      env.classList.add("open");
+      document.getElementById("hint").textContent = "Read slowly 🌷";
+      // heart burst
+      for (let i = 0; i < 30; i++) {
+        const h = document.createElement("span");
+        h.className = "spark";
+        h.textContent = ["💗", "💕", "🌸", "✨"][i % 4];
+        h.style.fontSize = 18 + Math.random() * 16 + "px";
+        const r = env.getBoundingClientRect();
+        h.style.left = r.left + r.width / 2 + "px";
+        h.style.top = r.top + r.height / 3 + "px";
+        const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 180;
+        h.style.setProperty("--dx", Math.cos(a) * d + "px");
+        h.style.setProperty("--dy", Math.sin(a) * d + "px");
+        h.style.animationDuration = "1.4s";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1400);
+      }
+      setTimeout(() => {
+        env.style.display = "none";
+        document.getElementById("letter").classList.add("show");
+        document.getElementById("back").style.display = "block";
+      }, 900);
+    });
+  </script>
+</body>
+</html>

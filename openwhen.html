@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open When Letters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>Open when…</h1>
+      <p>Little letters for different kinds of days. Open the one you need, whenever you need it.</p>
+    </div>
+    <div class="env-grid" id="envs"></div>
+
+    <div class="next-link"><a href="smile.html" class="btn">Next: Smile Zone 😄</a></div>
+  </main>
+
+  <footer>come back to these any time ♡</footer>
+
+  <div class="modal" id="modal">
+    <div class="letter-paper">
+      <button class="close-x" id="close" aria-label="Close">×</button>
+      <h2 id="m-title"></h2>
+      <div id="m-body"></div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    // ✏️ Edit these letters — your own words will mean the most.
+    const letters = [
+      {
+        label: "you feel sad",
+        title: "Hey, it's okay 🤍",
+        body: [
+          "It's okay to feel sad. You don't have to pretend to be fine all the time.",
+          "Cry if you need to, eat something nice, wrap yourself in a blanket. Feelings are like weather — this one will pass too.",
+          "And just so you know: you're not alone in this. Not even a little bit."
+        ]
+      },
+      {
+        label: "you can't sleep",
+        title: "Late night thoughts 🌙",
+        body: [
+          "Overthinking at 2am again? Put the phone a bit away from your face (after reading this, obviously).",
+          "Take a deep breath in… hold… and out. Do that three times.",
+          "Tomorrow is a fresh page. You don't have to figure out everything tonight. Sleep well, Simran. 🌙"
+        ]
+      },
+      {
+        label: "you need a laugh",
+        title: "Emergency laugh delivery 😂",
+        body: [
+          "Why did the scarecrow win an award? Because he was outstanding in his field. 🌾",
+          "Okay okay, that was bad. But you smiled a little, right? Mission accomplished.",
+          "Also, go to the Smile Zone page. There's more where that came from. Unfortunately for you."
+        ]
+      },
+      {
+        label: "you feel alone",
+        title: "You're not alone 🫂",
+        body: [
+          "It might feel that way sometimes, but there are people who really care about you. I'm one of them.",
+          "Text someone. Call a friend. Or just text me — even if it's just a random emoji.",
+          "You matter more than you know."
+        ]
+      },
+      {
+        label: "you doubt yourself",
+        title: "Read this twice 💪",
+        body: [
+          "You are enough. Exactly as you are. Not 'when you fix this' or 'after you change that'. Now.",
+          "Someone else not seeing your worth doesn't reduce it even by 1%.",
+          "You've gotten through every hard day so far. That's a 100% success rate."
+        ]
+      },
+      {
+        label: "you need motivation",
+        title: "Main character time ✨",
+        body: [
+          "This is the part of the movie where she gets her glow back. 💅",
+          "Drink some water, put on your favourite song, and do one small thing for yourself today.",
+          "New chapter, new you. And honestly? It's going to be a good one."
+        ]
+      },
+      {
+        label: "you miss the old days",
+        title: "About the past 🍂",
+        body: [
+          "It's normal to miss things, even things that weren't right for you.",
+          "Be gentle with yourself. Healing isn't a straight line — some days will be better than others.",
+          "The best days aren't behind you. A lot of them haven't even happened yet."
+        ]
+      },
+      {
+        label: "you're happy",
+        title: "YAY 🎉",
+        body: [
+          "Look at you! This makes me so happy.",
+          "Remember this feeling. Screenshot it mentally. This is what you deserve every day.",
+          "Now go do something fun. You earned it. 💗"
+        ]
+      }
+    ];
+
+    const wrap = document.getElementById("envs");
+    const modal = document.getElementById("modal");
+    letters.forEach((l) => {
+      const env = document.createElement("div");
+      env.className = "envelope";
+      env.innerHTML = `<div class="seal">💌</div><span>open when ${l.label}</span>`;
+      env.addEventListener("click", () => {
+        document.getElementById("m-title").textContent = l.title;
+        document.getElementById("m-body").innerHTML = l.body.map((p) => `<p>${p}</p>`).join("");
+        modal.classList.add("open");
+        env.classList.add("read");
+      });
+      wrap.appendChild(env);
+    });
+    const close = () => modal.classList.remove("open");
+    document.getElementById("close").addEventListener("click", close);
+    modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  </script>
+</body>
+</html>

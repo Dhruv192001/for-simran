@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hey Simran 🌸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <!-- Put her photo at images/simran.jpg -->
+      <img src="images/simran.jpg" alt="Simran" class="hero-photo"
+           onerror="this.outerHTML='<div class=&quot;hero-photo fallback&quot;>🌸</div>'" />
+      <h1>Hey Simran <span>👋</span></h1>
+      <p class="typed" id="typed"></p>
+      <a href="#explore" class="btn">Open your little surprise 🎁</a>
+    </section>
+
+    <section id="explore">
+      <div class="page-title fade-in">
+        <h1>A tiny world, just for you</h1>
+        <p>Click around. Take your time. There's no wrong way to do this.</p>
+      </div>
+      <div class="cards">
+        <a href="reasons.html" class="card fade-in">
+          <div class="emoji">💌</div>
+          <h3>Reasons</h3>
+          <p>Some reminders of how amazing you are (in case you forgot).</p>
+        </a>
+        <a href="memories.html" class="card fade-in">
+          <div class="emoji">📸</div>
+          <h3>Memories</h3>
+          <p>Little moments worth smiling about.</p>
+        </a>
+        <a href="openwhen.html" class="card fade-in">
+          <div class="emoji">✉️</div>
+          <h3>Open When…</h3>
+          <p>Letters for the days you need them.</p>
+        </a>
+        <a href="smile.html" class="card fade-in">
+          <div class="emoji">😄</div>
+          <h3>Smile Zone</h3>
+          <p>Bad jokes, bubble wrap, and free virtual hugs.</p>
+        </a>
+        <a href="letter.html" class="card fade-in">
+          <div class="emoji">💗</div>
+          <h3>A Letter</h3>
+          <p>Save this one for last.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>made with way too much care, just for you ♡</footer>
+
+  <script src="main.js"></script>
+  <script>
+    const lines = [
+      "This little website exists for one reason…",
+      "to remind you that you're seriously special. 🌷",
+      "Bad days don't last. But you? You're staying awesome.",
+      "Ready? Let's go. ✨"
+    ];
+    const el = document.getElementById("typed");
+    let li = 0, ci = 0, deleting = false;
+    function tick() {
+      const line = lines[li];
+      if (!deleting) {
+        el.textContent = line.slice(0, ++ci);
+        if (ci === line.length) {
+          if (li === lines.length - 1) return; // last line stays
+          deleting = true; setTimeout(tick, 1800); return;
+        }
+      } else {
+        el.textContent = line.slice(0, --ci);
+        if (ci === 0) { deleting = false; li++; }
+      }
+      setTimeout(tick, deleting ? 25 : 55);
+    }
+    tick();
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reasons You're Amazing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>Reasons you're amazing</h1>
+      <p>Tap each card. Read them slowly. Every single one is true.</p>
+    </div>
+    <p class="counter" id="counter">0 / 0 discovered</p>
+    <div class="flip-grid" id="grid"></div>
+
+    <div class="next-link"><a href="memories.html" class="btn">Next: Memories 📸</a></div>
+  </main>
+
+  <footer>and honestly, the list goes on…</footer>
+
+  <script src="main.js"></script>
+  <script>
+    // ✏️ Edit these! Make them personal — little things only you'd notice about her.
+    const reasons = [
+      ["😊", "Your smile can literally fix someone's whole day."],
+      ["💛", "You care about people way more than you let them see."],
+      ["😂", "Your laugh is contagious. Like, dangerously."],
+      ["🌟", "You're so much stronger than you think you are."],
+      ["🧠", "You're smart — the kind of smart that actually gets people."],
+      ["🌸", "You make ordinary moments feel special."],
+      ["🎧", "Your taste (in music, in everything) is elite."],
+      ["🤗", "Talking to you just feels easy."],
+      ["🔥", "You don't give up, even when things get hard."],
+      ["✨", "You light up a room without even trying."],
+      ["🌈", "You deserve all the good things coming your way."],
+      ["💗", "You're you. And that's honestly enough."]
+    ];
+    const grid = document.getElementById("grid");
+    const counter = document.getElementById("counter");
+    let found = 0;
+    counter.textContent = `0 / ${reasons.length} discovered`;
+    reasons.forEach(([emoji, text], i) => {
+      const card = document.createElement("div");
+      card.className = "flip";
+      card.innerHTML = `
+        <div class="flip-inner">
+          <div class="flip-face flip-front"><div class="num">#${i + 1}</div><small>tap me</small></div>
+          <div class="flip-face flip-back"><div class="emoji">${emoji}</div>${text}</div>
+        </div>`;
+      card.addEventListener("click", () => {
+        if (!card.dataset.seen) {
+          card.dataset.seen = 1;
+          found++;
+          counter.textContent = found === reasons.length
+            ? "All discovered! See? Told you you're amazing 💖"
+            : `${found} / ${reasons.length} discovered`;
+        }
+        card.classList.toggle("flipped");
+      });
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
