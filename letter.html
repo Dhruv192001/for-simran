@@ -19,6 +19,8 @@
       <li><a href="memories.html">Memories</a></li>
       <li><a href="openwhen.html">Open When</a></li>
       <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="gifts.html">Gifts</a></li>
       <li><a href="letter.html">A Letter</a></li>
     </ul>
   </nav>
@@ -46,9 +48,9 @@
       </div>
     </div>
 
-    <div class="next-link" id="back" style="display:none">
-      <a class="btn" data-wa="Hey Dhruv, I read your letter 💗">Text me 💬</a>
-      <a href="index.html" class="btn ghost">Back to the start 🏠</a>
+    <div class="next-link fade-in" id="back" style="display:none">
+      <a href="question.html" class="btn">One more thing… 🌷</a>
+      <a class="btn ghost" data-wa="Hey Dhruv, I read your letter 💗">Text me 💬</a>
     </div>
   </main>
 
@@ -79,8 +81,14 @@
       }
       setTimeout(() => {
         env.style.display = "none";
-        document.getElementById("letter").classList.add("show");
-        document.getElementById("back").style.display = "block";
+        const letter = document.getElementById("letter");
+        const lines = letter.querySelectorAll(".letter-paper > *");
+        lines.forEach((el, k) => (el.style.animationDelay = k * 1.1 + "s"));
+        letter.classList.add("show");
+        heartRain(6000, ["🌸", "🌹", "🌷", "💮"]);
+        // Show the buttons once the last line is in.
+        const back = document.getElementById("back");
+        setTimeout(() => { back.style.display = "flex"; back.classList.add("show"); }, lines.length * 1100 + 600);
       }, 900);
     });
   </script>

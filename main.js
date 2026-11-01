@@ -226,3 +226,222 @@ function setupMusic() {
   mp3.addEventListener("error", startYouTube, { once: true });
   mp3.src = MP3;
 }
+
+// ---------- Heart rain (used on big moments) ----------
+// Drops emojis from the top of the screen for `ms` milliseconds.
+function heartRain(ms = 4000, icons = ["💗", "💕", "🌸", "✨", "💖"]) {
+  const end = Date.now() + ms;
+  (function drop() {
+    if (Date.now() > end) return;
+    const h = document.createElement("span");
+    h.className = "rain";
+    h.textContent = icons[Math.floor(Math.random() * icons.length)];
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = 16 + Math.random() * 22 + "px";
+    const dur = 2.5 + Math.random() * 2.5;
+    h.style.animationDuration = dur + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), dur * 1000);
+    setTimeout(drop, 70);
+  })();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Night mode ----------
+  // Turns into a starry sky from 8pm to 6am. The 🌙/☀️ button switches it by hand.
+  const getTheme = () => { try { return localStorage.getItem("theme"); } catch (e) { return null; } };
+  const hour = new Date().getHours();
+  const autoNight = hour >= 20 || hour < 6;
+  let night = getTheme() ? getTheme() === "night" : autoNight;
+
+  const sky = document.createElement("div");
+  sky.id = "sky";
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement("i");
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.animationDelay = Math.random() * 4 + "s";
+    const size = Math.random() < 0.15 ? 3 : 2;
+    s.style.width = s.style.height = size + "px";
+    sky.appendChild(s);
+  }
+  document.body.prepend(sky);
+  if (!calm) setInterval(() => {
+    if (!night) return;
+    const st = document.createElement("b");
+    st.className = "shooting";
+    st.style.left = 20 + Math.random() * 70 + "%";
+    st.style.top = Math.random() * 40 + "%";
+    sky.appendChild(st);
+    setTimeout(() => st.remove(), 1500);
+  }, 5000);
+
+  const tbtn = document.createElement("button");
+  tbtn.id = "theme-btn";
+  tbtn.setAttribute("aria-label", "Switch day / night");
+  document.body.appendChild(tbtn);
+  const applyTheme = () => {
+    document.body.classList.toggle("night", night);
+    tbtn.textContent = night ? "☀️" : "🌙";
+  };
+  applyTheme();
+  tbtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    night = !night;
+    try { localStorage.setItem("theme", night ? "night" : "day"); } catch (err) {}
+    applyTheme();
+  });
+
+  // ---------- Little hearts follow the mouse (computers only) ----------
+  if (!calm && matchMedia("(pointer: fine)").matches) {
+    let last = 0;
+    document.addEventListener("pointermove", (e) => {
+      const now = Date.now();
+      if (now - last < 60) return;
+      last = now;
+      const t = document.createElement("span");
+      t.className = "trail";
+      t.textContent = night ? "✨" : "💗";
+      t.style.left = e.clientX + "px";
+      t.style.top = e.clientY + "px";
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 800);
+    });
+  }
+
+  // ---------- Secret: tap her photo on the home page 5 times ----------
+  // ✏️ Change the secret note to whatever you want her to find.
+  let taps = 0, tapTimer;
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".hero-photo")) return;
+    taps++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => (taps = 0), 2500);
+    if (taps < 5) return;
+    taps = 0;
+    heartRain(3000);
+    const m = document.createElement("div");
+    m.className = "modal open";
+    m.innerHTML = `
+      <div class="letter-paper">
+        <button class="close-x" aria-label="Close">✕</button>
+        <h2>You found the secret 🤫</h2>
+        <p>Okay, I didn't think you'd actually tap that many times.</p>
+        <p>Since you're here: I smile every time I see your name pop up on my phone. Every single time. Don't tell anyone. 🙈</p>
+        <p class="sign">— D ♡</p>
+      </div>`;
+    m.addEventListener("click", (ev) => { if (ev.target === m || ev.target.closest(".close-x")) m.remove(); });
+    document.body.appendChild(m);
+  });
+});
+
+// ---------- Hidden "I love you" ----------
+// Two secret doors: a rare golden heart that floats by on any page,
+// and the ♡ next to the signature in the letter.
+// ✏️ Write these in your own words. The lines appear one by one, then the big words, then the last line.
+const LOVE_LINES = [
+  "I've been trying to find the right way to say this for a while now.",
+  "Not in a big, loud way. Just honestly.",
+  "You make ordinary days feel softer. Your name on my screen still makes me smile like an idiot.",
+  "And on your hardest days, I wished I could carry some of it for you, even a little.",
+  "So here it is. Quietly. No pressure attached:"
+];
+const LOVE_WORDS = "I love you, Simran.";
+const LOVE_AFTER = "Not because you have to say it back. Just because you deserve to know that someone does, completely. 🤍";
+
+function revealLove() {
+  if (document.getElementById("love")) return;
+  const o = document.createElement("div");
+  o.id = "love";
+  const box = document.createElement("div");
+  box.className = "love-box";
+  o.appendChild(box);
+
+  let t = 0.8; // seconds
+  LOVE_LINES.forEach((line) => {
+    const p = document.createElement("p");
+    p.className = "love-line";
+    p.textContent = line;
+    p.style.animationDelay = t + "s";
+    box.appendChild(p);
+    t += 0.9 + line.length * 0.035; // longer lines stay a bit longer before the next
+  });
+
+  t += 0.6;
+  const h = document.createElement("h1");
+  // Each word is kept together so a name like "Simran" never breaks across lines.
+  let k = 0;
+  LOVE_WORDS.split(" ").forEach((word, w) => {
+    if (w) { h.appendChild(document.createTextNode(" ")); k++; }
+    const wordEl = document.createElement("span");
+    wordEl.className = "love-word";
+    [...word].forEach((ch) => {
+      const sp = document.createElement("span");
+      sp.textContent = ch;
+      sp.style.animationDelay = t + k++ * 0.14 + "s";
+      wordEl.appendChild(sp);
+    });
+    h.appendChild(wordEl);
+  });
+  box.appendChild(h);
+  const bigAt = t + LOVE_WORDS.length * 0.14;
+
+  const after = document.createElement("p");
+  after.className = "love-line love-after";
+  after.textContent = LOVE_AFTER;
+  after.style.animationDelay = bigAt + 1.2 + "s";
+  box.appendChild(after);
+
+  const sign = document.createElement("p");
+  sign.className = "love-line love-sign";
+  sign.textContent = "— Dhruv ♡";
+  sign.style.animationDelay = bigAt + 2.4 + "s";
+  box.appendChild(sign);
+
+  const hint = document.createElement("small");
+  hint.textContent = "tap anywhere to close";
+  hint.style.animationDelay = bigAt + 3.5 + "s";
+  o.appendChild(hint);
+
+  // Closing only works once everything has appeared, so a stray tap doesn't cut it short.
+  let canClose = false;
+  setTimeout(() => (canClose = true), (bigAt + 3.5) * 1000);
+  o.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!canClose) return;
+    o.classList.add("bye");
+    setTimeout(() => o.remove(), 600);
+  });
+  document.body.appendChild(o);
+  setTimeout(() => heartRain(6000, ["💗", "💖", "💕", "❤️"]), (bigAt - 0.5) * 1000);
+  try { localStorage.setItem("foundLove", "yes"); } catch (e) {}
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Golden heart: always on screen, slowly wandering around. Tap it to open the message.
+  const g = document.createElement("button");
+  g.className = "golden";
+  g.setAttribute("aria-label", "a golden heart, tap me");
+  g.innerHTML = "💛<small>catch me!</small>";
+  g.addEventListener("click", (e) => { e.stopPropagation(); revealLove(); });
+  document.body.appendChild(g);
+  function wander() {
+    const w = g.offsetWidth || 90, h = g.offsetHeight || 70;
+    const x = 10 + Math.random() * Math.max(0, innerWidth - w - 20);
+    const y = 80 + Math.random() * Math.max(0, innerHeight - h - 170); // stay clear of the nav and the bottom buttons
+    g.style.left = x + "px";
+    g.style.top = y + "px";
+  }
+  wander();
+  setInterval(wander, 4000);
+  addEventListener("resize", wander);
+
+  // The ♡ in the letter's signature
+  document.querySelectorAll(".sign").forEach((sig) => {
+    sig.innerHTML = sig.innerHTML.replace("♡", '<span class="secret-heart">♡</span>') + '<small class="tap-hint">psst… tap the ♡</small>';
+    const sh = sig.querySelector(".secret-heart");
+    if (sh) sh.addEventListener("click", (e) => { e.stopPropagation(); revealLove(); });
+  });
+});

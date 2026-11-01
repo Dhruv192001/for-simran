@@ -19,6 +19,8 @@
       <li><a href="memories.html">Memories</a></li>
       <li><a href="openwhen.html">Open When</a></li>
       <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="gifts.html">Gifts</a></li>
       <li><a href="letter.html">A Letter</a></li>
     </ul>
   </nav>
@@ -28,6 +30,7 @@
       <h1>Little memories</h1>
       <p>Moments that made life a bit brighter. Tap any photo to see it big.</p>
     </div>
+    <div class="story-btn"><button class="btn" id="playStory">Play the Simran show ✨</button></div>
     <div class="gallery" id="gallery"></div>
 
     <div class="next-link"><a href="openwhen.html" class="btn">Next: Open When ✉️</a></div>
@@ -36,8 +39,12 @@
   <footer>more memories loading… 🌷</footer>
 
   <div class="lightbox" id="lightbox">
+    <button class="close-x lb-close" aria-label="Close">✕</button>
+    <button class="lb-nav lb-prev" aria-label="Previous">‹</button>
     <img id="lb-img" alt="" />
     <p id="lb-cap"></p>
+    <p class="lb-count" id="lb-count"></p>
+    <button class="lb-nav lb-next" aria-label="Next">›</button>
   </div>
 
   <script src="main.js"></script>
@@ -66,7 +73,11 @@
 
     const gallery = document.getElementById("gallery");
     const lb = document.getElementById("lightbox");
-    photos.forEach(([src, caption], i) => {
+    const lbImg = document.getElementById("lb-img");
+    const good = []; // photos that loaded, in order
+    let cur = 0, timer = null;
+
+    photos.forEach(([src, caption]) => {
       const fig = document.createElement("figure");
       fig.className = "polaroid";
       const img = new Image();
@@ -79,21 +90,65 @@
         }));
         fig.style.cursor = "default";
         fig.dataset.empty = 1;
+        const k = good.findIndex((g) => g[0] === src);
+        if (k > -1) good.splice(k, 1);
       };
+      good.push([src, caption]);
       fig.appendChild(img);
       const cap = document.createElement("figcaption");
       cap.textContent = caption;
       fig.appendChild(cap);
       fig.addEventListener("click", () => {
         if (fig.dataset.empty) return;
-        document.getElementById("lb-img").src = src;
-        document.getElementById("lb-cap").textContent = caption;
-        lb.classList.add("open");
+        open(good.findIndex((g) => g[0] === src), false);
       });
       gallery.appendChild(fig);
     });
-    lb.addEventListener("click", () => lb.classList.remove("open"));
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") lb.classList.remove("open"); });
+
+    function showPhoto(k, story) {
+      cur = (k + good.length) % good.length;
+      const [src, caption] = good[cur];
+      lbImg.src = src;
+      lbImg.classList.remove("kb", "fadein"); void lbImg.offsetWidth;
+      lbImg.classList.add(story ? "kb" : "fadein");
+      document.getElementById("lb-cap").textContent = caption;
+      document.getElementById("lb-count").textContent = `${cur + 1} / ${good.length}`;
+    }
+    function open(k, story) {
+      if (!good.length) return;
+      lb.classList.add("open");
+      showPhoto(k, story);
+      clearInterval(timer);
+      if (story) {
+        timer = setInterval(() => {
+          if (cur === good.length - 1) { close(); heartRain(3000); return; }
+          showPhoto(cur + 1, true);
+        }, 4500);
+      }
+    }
+    function close() { lb.classList.remove("open"); clearInterval(timer); }
+    function step(d) { clearInterval(timer); showPhoto(cur + d, false); }
+
+    document.getElementById("playStory").addEventListener("click", () => open(0, true));
+    lb.querySelector(".lb-prev").addEventListener("click", (e) => { e.stopPropagation(); step(-1); });
+    lb.querySelector(".lb-next").addEventListener("click", (e) => { e.stopPropagation(); step(1); });
+    lb.addEventListener("click", (e) => { if (e.target === lb || e.target.closest(".lb-close")) close(); });
+    lbImg.addEventListener("click", (e) => { e.stopPropagation(); step(1); });
+    document.addEventListener("keydown", (e) => {
+      if (!lb.classList.contains("open")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    });
+    // Swipe on phones
+    let sx = null;
+    lb.addEventListener("touchstart", (e) => (sx = e.touches[0].clientX), { passive: true });
+    lb.addEventListener("touchend", (e) => {
+      if (sx === null) return;
+      const dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+      sx = null;
+    });
   </script>
 </body>
 </html>

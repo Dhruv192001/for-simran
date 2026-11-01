@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌸</text></svg>" />
+  <title>Little Gifts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="gifts.html">Gifts</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>Little gifts 🎁</h1>
+      <p>Some things you can unwrap, scratch, and cash in. Real ones.</p>
+    </div>
+
+    <section class="gift-section">
+      <h2>Scratch me ✨</h2>
+      <p>Use your finger (or mouse). Something's hiding under there.</p>
+      <div class="scratch-wrap">
+        <div class="scratch-msg" id="scratchMsg"></div>
+        <canvas id="scratch"></canvas>
+      </div>
+      <div class="wa-wrap" style="margin-top:18px"><button class="btn ghost" id="another" style="display:none">Another one 🔁</button></div>
+    </section>
+
+    <section class="gift-section">
+      <h2>Coupon book 🎟️</h2>
+      <p>Valid forever. No expiry date. Tap “Redeem” and I'll get a message.</p>
+      <div class="coupons" id="coupons"></div>
+    </section>
+
+    <div class="next-link"><a href="letter.html" class="btn">Last one: A Letter 💗</a></div>
+  </main>
+
+  <footer>more gifts loading… ♡</footer>
+
+  <script src="main.js"></script>
+  <script>
+    // ✏️ Scratch card messages (a random one each time).
+    const scratchMsgs = [
+      "You owe me one smile. Pay up. 😊",
+      "Fun fact: you're my favourite notification. 📱",
+      "This card is worth one (1) giant hug 🫂",
+      "Whatever happens, you've got me. 🤍",
+      "You + ice cream + me = plan? 🍦",
+      "Psst… you look cute right now. Don't argue. 🌸"
+    ];
+
+    // ✏️ Coupons: emoji, title, small print, and true at the end if it never gets used up.
+    const coupons = [
+      ["🍦", "One ice cream date", "Your choice of flavour. Mine is paying."],
+      ["📞", "One 3am call", "No questions asked. I'll pick up."],
+      ["🎬", "Movie night", "You pick the movie. I won't complain. (Much.)"],
+      ["🫂", "Unlimited hugs", "Redeemable in person. Never runs out.", true],
+      ["🍕", "Food of your choice", "Craving something? Done."],
+      ["🎧", "A playlist made for you", "Tell me the vibe, I'll make it."],
+      ["🙊", "Win one argument", "You're right. Automatically. Once."],
+      ["🌙", "A long walk + talk", "Phones away. Just us and the sky."]
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const store = {
+      get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    };
+
+    // ---------- Scratch card ----------
+    const canvas = $("scratch");
+    const ctx = canvas.getContext("2d");
+    let lastMsg, scratching = false, revealed = false;
+
+    function newCard() {
+      let m;
+      do { m = scratchMsgs[Math.floor(Math.random() * scratchMsgs.length)]; } while (scratchMsgs.length > 1 && m === lastMsg);
+      lastMsg = m;
+      $("scratchMsg").textContent = m;
+      revealed = false;
+      canvas.classList.remove("done");
+      $("another").style.display = "none";
+      const r = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = r.width * dpr;
+      canvas.height = r.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+      const g = ctx.createLinearGradient(0, 0, r.width, r.height);
+      g.addColorStop(0, "#ff9cb9");
+      g.addColorStop(1, "#b9a3ff");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, r.width, r.height);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.textAlign = "center";
+      ctx.font = "700 34px Caveat, cursive";
+      ctx.fillText("scratch here ✨", r.width / 2, r.height / 2 + 10);
+    }
+
+    function scratchAt(e) {
+      const r = canvas.getBoundingClientRect();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(e.clientX - r.left, e.clientY - r.top, 22, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function checkDone() {
+      if (revealed) return;
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let clear = 0;
+      for (let k = 3; k < data.length; k += 4 * 16) if (data[k] === 0) clear++;
+      if (clear / (data.length / (4 * 16)) > 0.5) {
+        revealed = true;
+        canvas.classList.add("done");
+        $("another").style.display = "inline-block";
+      }
+    }
+
+    canvas.addEventListener("pointerdown", (e) => { scratching = true; canvas.setPointerCapture(e.pointerId); scratchAt(e); });
+    canvas.addEventListener("pointermove", (e) => { if (scratching) scratchAt(e); });
+    canvas.addEventListener("pointerup", () => { scratching = false; checkDone(); });
+    canvas.addEventListener("pointercancel", () => { scratching = false; });
+    $("another").addEventListener("click", newCard);
+    // Wait for the handwriting font so the "scratch here" text looks right.
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(newCard);
+
+    // ---------- Coupons ----------
+    const used = store.get("usedCoupons") || [];
+    function renderCoupons() {
+      $("coupons").innerHTML = "";
+      coupons.forEach(([emoji, title, small, forever], k) => {
+        const isUsed = used.includes(k);
+        const c = document.createElement("div");
+        c.className = "coupon" + (isUsed ? " used" : "");
+        c.innerHTML = `<div class="emoji"></div><h3></h3><small></small>`;
+        c.querySelector(".emoji").textContent = emoji;
+        c.querySelector("h3").textContent = title;
+        c.querySelector("small").textContent = small;
+        if (isUsed) {
+          c.insertAdjacentHTML("beforeend", `<span class="stamp">REDEEMED</span>`);
+        } else {
+          const url = waLink(`Hey Dhruv! I'm redeeming my coupon: ${emoji} ${title} 🎟️`);
+          if (url) {
+            const a = document.createElement("a");
+            a.className = "btn";
+            a.textContent = "Redeem 💌";
+            a.href = url; a.target = "_blank"; a.rel = "noopener";
+            a.addEventListener("click", () => { if (forever) return; used.push(k); store.set("usedCoupons", used); setTimeout(renderCoupons, 300); });
+            c.appendChild(a);
+          }
+        }
+        $("coupons").appendChild(c);
+      });
+    }
+    renderCoupons();
+  </script>
+</body>
+</html>

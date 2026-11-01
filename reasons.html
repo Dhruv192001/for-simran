@@ -19,6 +19,8 @@
       <li><a href="memories.html">Memories</a></li>
       <li><a href="openwhen.html">Open When</a></li>
       <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="gifts.html">Gifts</a></li>
       <li><a href="letter.html">A Letter</a></li>
     </ul>
   </nav>
@@ -72,11 +74,27 @@
           counter.textContent = found === reasons.length
             ? "All discovered! See? Told you you're amazing 💖"
             : `${found} / ${reasons.length} discovered`;
+          if (found === reasons.length) unlockBonus();
         }
         card.classList.toggle("flipped");
       });
       grid.appendChild(card);
     });
+
+    // ✏️ The secret last reason, unlocked after she opens all the others.
+    const BONUS = ["🔐", "The real reason? There isn't one. It's just you. All of you."];
+    function unlockBonus() {
+      heartRain(3500);
+      const card = document.createElement("div");
+      card.className = "flip bonus";
+      card.innerHTML = `
+        <div class="flip-inner">
+          <div class="flip-face flip-front"><div class="num">#${reasons.length + 1}</div><small>secret one, unlocked 🔓</small></div>
+          <div class="flip-face flip-back"><div class="emoji">${BONUS[0]}</div>${BONUS[1]}</div>
+        </div>`;
+      card.addEventListener("click", () => card.classList.toggle("flipped"));
+      setTimeout(() => { grid.appendChild(card); card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 900);
+    }
   </script>
 </body>
 </html>

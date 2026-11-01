@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌷</text></svg>" />
+  <title>One Small Question</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="gifts.html">Gifts</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="ask">
+      <!-- Step 1: a gentle heads-up -->
+      <div class="ask-step show" id="step1">
+        <div class="page-title">
+          <h1>One small question…</h1>
+          <p>Only if you feel like it. You can close this page and nothing changes. 🌷</p>
+        </div>
+        <button class="btn" id="ready">Okay, I'm ready 🙈</button>
+      </div>
+
+      <!-- Step 2: the question. ✏️ Change the words to sound like you. -->
+      <div class="ask-step" id="step2">
+        <div class="letter-paper">
+          <p>Simran,</p>
+          <p>You already know I'm in your corner. That part isn't going anywhere, no matter what you say next.</p>
+          <p>But I'd be lying if I said that's all I feel. Somewhere between the late-night talks and the dumb jokes, you became my favourite person.</p>
+          <p>So whenever you're ready, and only then:</p>
+          <p class="ask-q">Can I be a little more than just a friend to you? 💗</p>
+          <div class="ask-btns">
+            <button class="btn" data-answer="yes">Yes 💗</button>
+            <button class="btn ghost" data-answer="time">I need some time 🌙</button>
+            <button class="btn ghost" data-answer="friends">Let's stay just like this 🤍</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: whatever she says, a kind reply -->
+      <div class="ask-answer" id="ans-yes">
+        <div class="page-title">
+          <h1>Okay wow 🥹</h1>
+          <p>I'm probably smiling like an idiot right now. Thank you for trusting me with this.</p>
+        </div>
+        <div class="next-link"><a class="btn" data-wa="Hey Dhruv… I said yes 💗">Tell me yourself 💬</a></div>
+      </div>
+      <div class="ask-answer" id="ans-time">
+        <div class="page-title">
+          <h1>Take all the time you need 🌙</h1>
+          <p>No rush. No deadline. I'm not going anywhere, and nothing between us changes.</p>
+        </div>
+        <div class="next-link"><a class="btn" data-wa="Hey Dhruv, I read it. Give me some time, okay? 🌙">Let me know you saw it 💬</a></div>
+      </div>
+      <div class="ask-answer" id="ans-friends">
+        <div class="page-title">
+          <h1>Always, then 🤍</h1>
+          <p>Thank you for being honest. I meant it: still in your corner, still sending bad memes, still here.</p>
+        </div>
+        <div class="next-link"><a class="btn" data-wa="Hey Dhruv, I read it. Still us? 🤍">Text me 💬</a></div>
+      </div>
+
+      <div class="next-link" id="home" style="display:none"><a href="index.html" class="btn ghost">Back to the start 🏠</a></div>
+    </div>
+  </main>
+
+  <footer>♡</footer>
+
+  <script src="main.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    $("ready").addEventListener("click", () => {
+      $("step1").classList.remove("show");
+      $("step2").classList.add("show");
+    });
+
+    document.querySelectorAll("[data-answer]").forEach((b) => {
+      b.addEventListener("click", () => {
+        const a = b.dataset.answer;
+        $("step2").classList.remove("show");
+        $("ans-" + a).classList.add("show");
+        $("home").style.display = "flex";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (a === "yes") { burst(); heartRain(7000); }
+      });
+    });
+
+    function burst() {
+      for (let i = 0; i < 50; i++) {
+        const h = document.createElement("span");
+        h.className = "spark";
+        h.textContent = ["💗", "💕", "🌸", "✨", "🥹"][i % 5];
+        h.style.fontSize = 18 + Math.random() * 20 + "px";
+        h.style.left = innerWidth / 2 + "px";
+        h.style.top = innerHeight / 3 + "px";
+        const ang = Math.random() * Math.PI * 2, d = 100 + Math.random() * 260;
+        h.style.setProperty("--dx", Math.cos(ang) * d + "px");
+        h.style.setProperty("--dy", Math.sin(ang) * d + "px");
+        h.style.animationDuration = "1.8s";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1800);
+      }
+    }
+  </script>
+</body>
+</html>

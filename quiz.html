@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌸</text></svg>" />
+  <title>A Little Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">for Simran ♡</a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="reasons.html">Reasons</a></li>
+      <li><a href="memories.html">Memories</a></li>
+      <li><a href="openwhen.html">Open When</a></li>
+      <li><a href="smile.html">Smile Zone</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="gifts.html">Gifts</a></li>
+      <li><a href="letter.html">A Letter</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <h1>A tiny quiz 🧠</h1>
+      <p>No pressure. There are no stupid answers. (Okay, maybe a few.)</p>
+    </div>
+
+    <div class="box quiz-box" id="quiz">
+      <div class="quiz-progress"><div id="bar"></div></div>
+      <small id="qnum" style="color:var(--muted);font-weight:700"></small>
+      <p class="quiz-q" id="q"></p>
+      <div class="quiz-opts" id="opts"></div>
+      <div class="out" id="qout" style="min-height:60px"></div>
+    </div>
+
+    <div class="next-link"><a href="gifts.html" class="btn">Next: Little Gifts 🎁</a></div>
+  </main>
+
+  <footer>you passed. you always do. ♡</footer>
+
+  <script src="main.js"></script>
+  <script>
+    // ✏️ Edit these! Each one is: question, options, index of the right option (starting at 0), and a line shown when she gets it right.
+    // Add a couple only you two would know, e.g.
+    //   ["Where did we first talk?", ["Class", "Instagram", "A party"], 1, "Yep! And I'm so glad we did 💗"],
+    const questions = [
+      ["What's my favourite thing about you?", ["Your smile", "Your laugh", "How kind you are", "All of the above, obviously"], 3, "Correct. It was a trick question 😌"],
+      ["If you text me at 3am, I will…", ["Ignore it", "Reply in the morning", "Reply instantly, probably with a meme"], 2, "Every single time. 📱"],
+      ["Who's the main character of this website?", ["The floating hearts", "Dhruv", "You. Always you."], 2, "Obviously. I just made the set 🎬"],
+      ["How many times did I think about you while making this?", ["Like, twice", "A few times", "Lost count on day one"], 2, "Honestly, embarrassingly many 🙈"],
+      ["What do you deserve?", ["The bare minimum", "Whatever's left over", "All the good things. Every one."], 2, "Write it down. Read it on bad days. 🌷"],
+      ["Bad day emergency plan:", ["Suffer in silence", "Open this site + text me", "Pretend you're fine"], 1, "Good choice. I'm always one text away. 💬"]
+    ];
+    const wrongLines = ["Hmm, try again 👀", "Nope! Think with your heart 💭", "Wrong… but cute attempt 😜", "Not that one! 🙈"];
+
+    let i = 0, score = 0, firstTry = true;
+    const $ = (id) => document.getElementById(id);
+
+    function show() {
+      const [q, opts] = questions[i];
+      firstTry = true;
+      $("qnum").textContent = `Question ${i + 1} of ${questions.length}`;
+      $("bar").style.width = (i / questions.length) * 100 + "%";
+      $("q").textContent = q;
+      $("qout").textContent = "";
+      $("opts").innerHTML = "";
+      opts.forEach((text, k) => {
+        const b = document.createElement("button");
+        b.className = "quiz-opt";
+        b.textContent = text;
+        b.addEventListener("click", () => answer(b, k));
+        $("opts").appendChild(b);
+      });
+    }
+
+    function answer(btn, k) {
+      const [, , right, yay] = questions[i];
+      if (k === right) {
+        if (firstTry) score++;
+        btn.classList.add("right");
+        $("opts").querySelectorAll("button").forEach((b) => (b.disabled = true));
+        $("qout").textContent = yay;
+        setTimeout(() => { i++; i < questions.length ? show() : finish(); }, 1500);
+      } else {
+        firstTry = false;
+        btn.classList.remove("wrong"); void btn.offsetWidth; btn.classList.add("wrong");
+        $("qout").textContent = wrongLines[Math.floor(Math.random() * wrongLines.length)];
+      }
+    }
+
+    function finish() {
+      const total = questions.length;
+      const line = score === total ? "Perfect score. You know me way too well 😳"
+        : score >= total / 2 ? "Pretty good! You clearly pay attention 💗"
+        : "Okay, we need to hang out more. Clearly. 😤";
+      $("quiz").innerHTML = `
+        <div class="quiz-progress"><div style="width:100%"></div></div>
+        <div class="quiz-big">${score === total ? "🏆" : "🎉"}</div>
+        <h2>${score} / ${total}</h2>
+        <div class="out" style="min-height:50px">${line}</div>
+        <div class="next-link" style="margin-top:0">
+          <a class="btn" id="share">Tell me your score 💬</a>
+          <button class="btn ghost" onclick="location.reload()">Try again 🔁</button>
+        </div>`;
+      const url = waLink(`I got ${score}/${total} on your quiz 😌`);
+      const share = $("share");
+      if (url) { share.href = url; share.target = "_blank"; share.rel = "noopener"; } else share.remove();
+    }
+
+    show();
+  </script>
+</body>
+</html>
