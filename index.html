@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌸</text></svg>" />
   <title>Hey Simran 🌸</title>
+  <!-- Link preview on WhatsApp / Instagram. Replace USERNAME with your GitHub username. -->
+  <meta name="description" content="A tiny world, made just for you. Open it when you have a minute. 🌷" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Hey Simran 🌸" />
+  <meta property="og:description" content="A tiny world, made just for you. Open it when you have a minute. 🌷" />
+  <meta property="og:url" content="https://USERNAME.github.io/for-simran/" />
+  <meta property="og:image" content="https://USERNAME.github.io/for-simran/images/simran.jpg" />
+  <meta property="og:image:width" content="500" />
+  <meta property="og:image:height" content="500" />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
@@ -36,6 +47,11 @@
       <div class="page-title fade-in">
         <h1>A tiny world, just for you</h1>
         <p>Click around. Take your time. There's no wrong way to do this.</p>
+      </div>
+      <div class="daily-note fade-in">
+        <small>today's little note 🌼</small>
+        <p id="daily"></p>
+        <small class="muted">a new one every day. come back tomorrow 👀</small>
       </div>
       <div class="cards">
         <a href="reasons.html" class="card fade-in">
@@ -94,6 +110,33 @@
       setTimeout(tick, deleting ? 25 : 55);
     }
     tick();
+
+    // ✏️ Today's note: one per day, it cycles through this list.
+    const notes = [
+      "Drink some water today. Yes, right now. I'll wait. 💧",
+      "You don't have to be productive today. Just be kind to yourself.",
+      "Somewhere, someone is smiling because of something you said once.",
+      "Today's mission: one small thing that makes you happy. Anything counts.",
+      "You're allowed to rest. Rest is not giving up. 🌙",
+      "Reminder: you've survived 100% of your bad days so far.",
+      "Go outside for five minutes. Look at the sky. It's free. ☁️",
+      "Your feelings are valid. Even the confusing ones.",
+      "Put on your favourite song and do nothing else for three minutes. 🎧",
+      "You're doing better than you think you are.",
+      "Text a friend something random. It'll make both your days. 📱",
+      "You deserve the same kindness you give everyone else.",
+      "Healing isn't a straight line. Today can be a wobbly day, and that's fine.",
+      "Eat something nice today. Treat yourself like someone you love. 🍫",
+      "You're not too much. You never were.",
+      "Small steps still move you forward. 🐾",
+      "Someone out there is really proud of you. (It's me. Hi.) 👋",
+      "Wear something that makes you feel cute today. Just because. 💅",
+      "The best chapters are still unwritten. ✍️",
+      "Breathe in. Breathe out. You're okay right now, in this exact moment.",
+      "Your smile is still one of my favourite things. Use it today. 😊"
+    ];
+    const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+    document.getElementById("daily").textContent = notes[day % notes.length];
   </script>
 </body>
 </html>

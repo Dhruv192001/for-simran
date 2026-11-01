@@ -1,5 +1,62 @@
 // Shared stuff for every page: nav, floating hearts, click sparkles, music, fade-ins.
 
+// ---------- Settings (edit these) ----------
+// Your WhatsApp number with country code, digits only (e.g. "919876543210").
+// Leave empty to hide the "text me" buttons.
+const WHATSAPP_NUMBER = "919905633670";
+// Secret question shown before the site opens. Answers are not case-sensitive.
+const GATE_QUESTION = "Who made this little world for you? 👀";
+const GATE_ANSWERS = ["dhruv"];
+
+// Returns a WhatsApp chat link with a ready-typed message, or null if no number is set.
+function waLink(text) {
+  if (!WHATSAPP_NUMBER) return null;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
+
+// ---------- Secret question gate ----------
+// Not real security (the files are public), just a cute little door.
+(function gate() {
+  const KEY = "unlocked";
+  try { if (localStorage.getItem(KEY) === "yes") return; } catch (e) {}
+  const g = document.createElement("div");
+  g.id = "gate";
+  g.innerHTML = `
+    <form class="gate-box">
+      <div class="gate-lock">🔒</div>
+      <h2>Hold on, Simran…</h2>
+      <p>Quick question before you go in:</p>
+      <p class="gate-q"></p>
+      <input type="text" autocomplete="off" autocapitalize="off" placeholder="type here…" />
+      <button class="btn" type="submit">Let me in ✨</button>
+      <p class="gate-msg"></p>
+    </form>`;
+  g.querySelector(".gate-q").textContent = GATE_QUESTION;
+  document.body.appendChild(g);
+  document.documentElement.style.overflow = "hidden";
+  const input = g.querySelector("input");
+  const msg = g.querySelector(".gate-msg");
+  const fails = ["Hmm, not quite 🤔", "Nope! Think harder 😜", "So close (maybe) 👀", "Hint: it's the person who made this 💭"];
+  let tries = 0;
+  g.querySelector("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (GATE_ANSWERS.includes(input.value.trim().toLowerCase())) {
+      try { localStorage.setItem(KEY, "yes"); } catch (err) {}
+      g.querySelector(".gate-lock").textContent = "🔓";
+      msg.textContent = "Welcome in 💗";
+      g.classList.add("bye");
+      document.documentElement.style.overflow = "";
+      setTimeout(() => g.remove(), 700);
+    } else {
+      msg.textContent = fails[Math.min(tries++, fails.length - 1)];
+      g.querySelector(".gate-box").classList.remove("shake");
+      void g.offsetWidth;
+      g.querySelector(".gate-box").classList.add("shake");
+    }
+  });
+  setTimeout(() => input.focus(), 100);
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
   // Mobile menu
   const menuBtn = document.querySelector(".menu-btn");
@@ -53,6 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
     entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("show"); io.unobserve(en.target); } });
   }, { threshold: 0.15 });
   document.querySelectorAll(".fade-in").forEach((el) => io.observe(el));
+
+  // "Text me" buttons: any element with data-wa="message" opens WhatsApp (hidden if no number)
+  document.querySelectorAll("[data-wa]").forEach((el) => {
+    const url = waLink(el.dataset.wa);
+    if (!url) { el.remove(); return; }
+    el.href = url;
+    el.target = "_blank";
+    el.rel = "noopener";
+  });
 
   setupMusic();
 });

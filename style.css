@@ -301,3 +301,56 @@ footer {
 }
 #mini-player.audio-only { width: auto; padding: 6px 8px 6px 16px; border-radius: 999px; }
 #mini-player.audio-only .mp-head { padding: 0; }
+
+/* ---------- Today's note (home) ---------- */
+.daily-note {
+  max-width: 560px; margin: 0 auto 10px; text-align: center;
+  background: #fffdf8; border-radius: var(--radius); padding: 22px 26px; box-shadow: var(--shadow);
+  border: 2px dashed #ffc2d4;
+}
+.daily-note small { display: block; font-weight: 700; color: var(--pink-deep); }
+.daily-note small.muted { color: var(--muted); font-weight: 500; font-size: 13px; }
+.daily-note p { font-family: "Caveat", cursive; font-size: 28px; line-height: 1.25; margin: 8px 0; }
+
+/* ---------- Text me buttons ---------- */
+.next-link { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.wa-wrap { text-align: center; margin-top: 6px; }
+
+/* ---------- Breathing circle (open when) ---------- */
+.breathe { display: flex; flex-direction: column; align-items: center; margin: 6px 0 18px; }
+.breathe-circle {
+  width: 130px; height: 130px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #ffc2d4 55%, var(--lav));
+  box-shadow: 0 0 40px rgba(185, 163, 255, 0.6);
+  transform: scale(0.45); transition: transform 4s ease-in-out;
+}
+.letter-paper .breathe-text { font-family: "Caveat", cursive; font-size: 30px; color: var(--pink-deep); margin: 10px 0 0 !important; }
+
+/* ---------- Happy jar (smile) ---------- */
+.jar-btn { font-size: 80px; background: none; border: 0; cursor: pointer; }
+.jar-btn.shake { animation: jarShake 0.4s; }
+@keyframes jarShake { 25% { transform: rotate(-14deg); } 50% { transform: rotate(12deg); } 75% { transform: rotate(-8deg); } }
+
+/* ---------- Secret question gate ---------- */
+#gate {
+  position: fixed; inset: 0; z-index: 1000; padding: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, var(--bg) 0%, var(--bg2) 50%, #f1e9ff 100%);
+  transition: opacity 0.6s;
+}
+#gate.bye { opacity: 0; pointer-events: none; }
+.gate-box {
+  width: 100%; max-width: 400px; text-align: center;
+  background: #fff; border-radius: var(--radius); padding: 32px 26px; box-shadow: var(--shadow);
+}
+.gate-box.shake { animation: jarShake 0.4s; }
+.gate-lock { font-size: 54px; }
+.gate-box h2 { font-size: 40px; color: var(--pink-deep); margin: 6px 0; }
+.gate-box p { color: var(--muted); }
+.gate-q { color: var(--ink) !important; font-weight: 700; font-size: 18px; margin: 10px 0 16px; }
+.gate-box input {
+  width: 100%; padding: 13px 18px; border-radius: 999px; border: 2px solid #ffc2d4;
+  font-family: inherit; font-size: 17px; text-align: center; outline: none; margin-bottom: 16px; color: var(--ink);
+}
+.gate-box input:focus { border-color: var(--pink); }
+.gate-msg { min-height: 1.4em; margin-top: 12px; font-weight: 600; color: var(--pink-deep) !important; }

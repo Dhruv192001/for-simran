@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌸</text></svg>" />
   <title>Smile Zone</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -54,6 +55,13 @@
         <p>Pop the bubbles. Each one is a worry. Bye bye.</p>
         <div class="bubble-area" id="bubbles"></div>
         <p class="score" id="score">Worries popped: 0</p>
+      </div>
+
+      <div class="box">
+        <h2>Happy jar 🫙</h2>
+        <p>Shake the jar. A happy little thought falls out.</p>
+        <button class="jar-btn" id="jar" aria-label="Shake the jar">🫙</button>
+        <div class="out" id="jarOut">Go on, tap it 👆</div>
       </div>
 
       <div class="box">
@@ -155,6 +163,28 @@
       setTimeout(() => b.remove(), dur * 1000);
     }
     setInterval(spawnBubble, 650);
+
+    // Happy jar
+    // ✏️ Replace these with your own memories and inside jokes. That's what makes it special.
+    const jarNotes = [
+      "That one time we laughed so hard we couldn't breathe. 😂",
+      "Your random 2am voice notes. Never stop. 🎙️",
+      "The way you get excited about food. Iconic. 🍕",
+      "Remember when everything went wrong and we still had fun? 🌧️",
+      "Your terrible singing that's somehow the best singing. 🎤",
+      "Every time you said 'I'm fine' and then told me everything anyway. 🤍",
+      "Your face when someone says something dumb. Priceless. 🙄",
+      "The playlist you made that I still listen to. 🎶",
+      "How you always know what to say when someone's down. 💛",
+      "Future plan: a trip, good food, zero stress. Loading… ✈️"
+    ];
+    let lastJar;
+    const jar = document.getElementById("jar");
+    jar.addEventListener("click", () => {
+      jar.classList.remove("shake"); void jar.offsetWidth; jar.classList.add("shake");
+      lastJar = pick(jarNotes, lastJar);
+      setTimeout(() => swap(document.getElementById("jarOut"), lastJar), 350);
+    });
 
     // Hugs
     let hugs = 0;

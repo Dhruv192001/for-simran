@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌸</text></svg>" />
   <title>Open When Letters</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -53,16 +54,18 @@
           "It's okay to feel sad. You don't have to pretend to be fine all the time.",
           "Cry if you need to, eat something nice, wrap yourself in a blanket. Feelings are like weather — this one will pass too.",
           "And just so you know: you're not alone in this. Not even a little bit."
-        ]
+        ],
+        wa: "hey, not having a great day today 😔"
       },
       {
         label: "you can't sleep",
         title: "Late night thoughts 🌙",
         body: [
           "Overthinking at 2am again? Put the phone a bit away from your face (after reading this, obviously).",
-          "Take a deep breath in… hold… and out. Do that three times.",
+          "Let's breathe together for a minute. Follow the circle: in as it grows, hold, out as it shrinks.",
           "Tomorrow is a fresh page. You don't have to figure out everything tonight. Sleep well, Simran. 🌙"
-        ]
+        ],
+        breathe: true
       },
       {
         label: "you need a laugh",
@@ -80,7 +83,8 @@
           "It might feel that way sometimes, but there are people who really care about you. I'm one of them.",
           "Text someone. Call a friend. Or just text me — even if it's just a random emoji.",
           "You matter more than you know."
-        ]
+        ],
+        wa: "hey… feeling a bit alone right now 🥺"
       },
       {
         label: "you doubt yourself",
@@ -122,19 +126,44 @@
 
     const wrap = document.getElementById("envs");
     const modal = document.getElementById("modal");
+    // Breathing circle: grows 4s (in), holds 4s, shrinks 6s (out), on repeat.
+    let breatheTimer;
+    function startBreathing(root) {
+      const circle = root.querySelector(".breathe-circle");
+      const text = root.querySelector(".breathe-text");
+      const steps = [["breathe in…", 4, 1], ["hold…", 4, 1], ["breathe out…", 6, 0.45]];
+      let i = 0;
+      const run = () => {
+        const [label, secs, scale] = steps[i];
+        text.textContent = label;
+        circle.style.transitionDuration = secs + "s";
+        circle.style.transform = `scale(${scale})`;
+        i = (i + 1) % steps.length;
+        breatheTimer = setTimeout(run, secs * 1000);
+      };
+      setTimeout(run, 50);
+    }
+
     letters.forEach((l) => {
       const env = document.createElement("div");
       env.className = "envelope";
       env.innerHTML = `<div class="seal">💌</div><span>open when ${l.label}</span>`;
       env.addEventListener("click", () => {
+        clearTimeout(breatheTimer);
         document.getElementById("m-title").textContent = l.title;
-        document.getElementById("m-body").innerHTML = l.body.map((p) => `<p>${p}</p>`).join("");
+        const body = document.getElementById("m-body");
+        const paras = l.body.map((p) => `<p>${p}</p>`);
+        if (l.breathe) paras.splice(2, 0, `<div class="breathe"><div class="breathe-circle"></div><p class="breathe-text">get comfy…</p></div>`);
+        body.innerHTML = paras.join("");
+        const url = l.wa && waLink(l.wa);
+        if (url) body.insertAdjacentHTML("beforeend", `<p class="wa-wrap"><a class="btn" target="_blank" rel="noopener" href="${url}">Text me 💬</a></p>`);
+        if (l.breathe) startBreathing(body);
         modal.classList.add("open");
         env.classList.add("read");
       });
       wrap.appendChild(env);
     });
-    const close = () => modal.classList.remove("open");
+    const close = () => { modal.classList.remove("open"); clearTimeout(breatheTimer); };
     document.getElementById("close").addEventListener("click", close);
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
