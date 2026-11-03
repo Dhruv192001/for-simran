@@ -7,6 +7,9 @@ const WHATSAPP_NUMBER = "919905633670";
 // Secret question shown before the site opens. Answers are not case-sensitive.
 const GATE_QUESTION = "Who made this little world for you? 👀";
 const GATE_ANSWERS = ["dhruv"];
+// Proposal page + hidden "I love you" (golden heart, tap the ♡ in the letter).
+// Turned off for now. Set to true when the time feels right.
+const SHOW_LOVE = false;
 
 // Returns a WhatsApp chat link with a ready-typed message, or null if no number is set.
 function waLink(text) {
@@ -420,6 +423,10 @@ function revealLove() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!SHOW_LOVE) {
+    document.querySelectorAll('a[href="question.html"]').forEach((a) => a.remove());
+    return;
+  }
   // Golden heart: always on screen, slowly wandering around. Tap it to open the message.
   const g = document.createElement("button");
   g.className = "golden";
@@ -440,6 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // The ♡ in the letter's signature
   document.querySelectorAll(".sign").forEach((sig) => {
+    if (!sig.innerHTML.includes("♡")) return;
     sig.innerHTML = sig.innerHTML.replace("♡", '<span class="secret-heart">♡</span>') + '<small class="tap-hint">psst… tap the ♡</small>';
     const sh = sig.querySelector(".secret-heart");
     if (sh) sh.addEventListener("click", (e) => { e.stopPropagation(); revealLove(); });
