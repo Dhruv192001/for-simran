@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌸</text></svg>" />
+  <link rel="icon" type="image/png" href="images/icon.png" />
+  <link rel="apple-touch-icon" href="images/icon.png" />
   <title>Hey Simran 🌸</title>
   <!-- Link preview on WhatsApp / Instagram. Replace USERNAME with your GitHub username. -->
   <meta name="description" content="A tiny world, made just for you. Open it when you have a minute. 🌷" />
@@ -97,41 +98,8 @@
 
   <footer>made with way too much care, just for you ♡</footer>
 
-  <!-- Sorry note: shows every time the site is opened (not again when coming back to Home in the same visit). -->
-  <div class="modal" id="sorry">
-    <div class="letter-paper">
-      <h2>Before anything else…</h2>
-      <p>I owe you an apology, Simran.</p>
-      <p>You were going through something really hard, and instead of being there for you, I let my anger come out on you. Right when you needed me the most. You needed calm and support, and I made it heavier. That was wrong.</p>
-      <p>I'm not going to make excuses. My anger is my problem to fix, not yours to deal with. I'm sorry. Truly.</p>
-      <p>I won't promise I'll never get angry again, because that wouldn't be honest. But I can promise this: when I feel it coming, I'll say "give me 10 minutes", step away, and come back calm. You won't get the angry version of me.</p>
-      <p>You don't have to reply, and you don't have to say it's okay. Take all the time you need. I just wanted you to know that I see it, and I'm working on it.</p>
-      <p class="sign">— Dhruv</p>
-      <div class="next-link" style="margin-top:10px">
-        <button class="btn" id="sorryOk">Okay, take me inside 🌷</button>
-        <a class="btn ghost" data-wa="Hey Dhruv, I read your sorry note.">Text me 💬</a>
-      </div>
-    </div>
-  </div>
-
   <script src="main.js"></script>
   <script>
-    (function sorryNote() {
-      try { if (sessionStorage.getItem("sorrySeen") === "yes") return; } catch (e) {}
-      const m = document.getElementById("sorry");
-      const show = () => {
-        if (document.getElementById("gate")) return setTimeout(show, 400); // wait for the lock screen
-        setTimeout(() => m.classList.add("open"), 500);
-      };
-      show();
-      const close = () => {
-        m.classList.remove("open");
-        try { sessionStorage.setItem("sorrySeen", "yes"); } catch (e) {}
-      };
-      document.getElementById("sorryOk").addEventListener("click", close);
-      m.querySelector("[data-wa]").addEventListener("click", close);
-    })();
-
     const lines = [
       "This little website exists for one reason…",
       "to remind you that you're seriously special. 🌷",

@@ -8,8 +8,8 @@ const WHATSAPP_NUMBER = "919905633670";
 const GATE_QUESTION = "Who made this little world for you? 👀";
 const GATE_ANSWERS = ["dhruv"];
 // Proposal page + hidden "I love you" (golden heart, tap the ♡ in the letter).
-// Turned off for now. Set to true when the time feels right.
-const SHOW_LOVE = false;
+// Set to false to hide all of it again.
+const SHOW_LOVE = true;
 
 // Returns a WhatsApp chat link with a ready-typed message, or null if no number is set.
 function waLink(text) {
@@ -349,6 +349,7 @@ const LOVE_LINES = [
   "Not in a big, loud way. Just honestly.",
   "You make ordinary days feel softer. Your name on my screen still makes me smile like an idiot.",
   "And on your hardest days, I wished I could carry some of it for you, even a little.",
+  "And the best part of my day? You sitting behind me on the bike. Even when your house is the opposite way. Especially then. 🏍️",
   "So here it is. Quietly. No pressure attached:"
 ];
 const LOVE_WORDS = "I love you, Simran.";
@@ -427,23 +428,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('a[href="question.html"]').forEach((a) => a.remove());
     return;
   }
-  // Golden heart: always on screen, slowly wandering around. Tap it to open the message.
+  // Golden heart: sits quietly in the bottom-left corner, above the 🌙 button. Tap it to open the message.
+  // The "tap me" label shows until she's opened it once.
   const g = document.createElement("button");
   g.className = "golden";
   g.setAttribute("aria-label", "a golden heart, tap me");
-  g.innerHTML = "💛<small>catch me!</small>";
-  g.addEventListener("click", (e) => { e.stopPropagation(); revealLove(); });
+  let found = false;
+  try { found = localStorage.getItem("foundLove") === "yes"; } catch (e) {}
+  g.innerHTML = found ? "💛" : "💛<small>tap me</small>";
+  g.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const label = g.querySelector("small");
+    if (label) label.remove();
+    revealLove();
+  });
   document.body.appendChild(g);
-  function wander() {
-    const w = g.offsetWidth || 90, h = g.offsetHeight || 70;
-    const x = 10 + Math.random() * Math.max(0, innerWidth - w - 20);
-    const y = 80 + Math.random() * Math.max(0, innerHeight - h - 170); // stay clear of the nav and the bottom buttons
-    g.style.left = x + "px";
-    g.style.top = y + "px";
-  }
-  wander();
-  setInterval(wander, 4000);
-  addEventListener("resize", wander);
 
   // The ♡ in the letter's signature
   document.querySelectorAll(".sign").forEach((sig) => {
@@ -452,4 +451,185 @@ document.addEventListener("DOMContentLoaded", () => {
     const sh = sig.querySelector(".secret-heart");
     if (sh) sh.addEventListener("click", (e) => { e.stopPropagation(); revealLove(); });
   });
+});
+
+// ---------- Little secrets ----------
+// Small surprises she finds on her own. ✏️ Change any of the lines below.
+
+// A small message that slides in from the top for a few seconds.
+function toast(text, ms = 3800) {
+  if (document.body.classList.contains("stage-mode")) return; // stay quiet during the proposal
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add("bye"), ms);
+  setTimeout(() => t.remove(), ms + 500);
+}
+// Runs fn once the lock screen is gone.
+function afterGate(fn) {
+  if (document.getElementById("gate")) return setTimeout(() => afterGate(fn), 400);
+  fn();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const sGet = (k) => { try { return sessionStorage.getItem(k); } catch (e) { return null; } };
+  const sSet = (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) {} };
+
+  // 1. Greeting by time of day + visit counter (once per visit, on the first page she lands on)
+  if (!sGet("greeted")) {
+    sSet("greeted", "1");
+    let visits = 1;
+    try { visits = (parseInt(localStorage.getItem("visits"), 10) || 0) + 1; localStorage.setItem("visits", visits); } catch (e) {}
+    const now = new Date();
+    const h = now.getHours();
+    const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    const hello =
+      h >= 1 && h < 5 ? `It's ${time}. Why are you awake? Go sleep 😴 (after this, obviously)` :
+      h < 12 ? "Good morning, sunshine ☀️" :
+      h < 17 ? "Hope your day is being nice to you 🌼" :
+      h < 21 ? "Evening! Did you eat something? 🍜" :
+      "Night owl mode on 🌙";
+    const visitLines = [
+      "Welcome back 🌷",
+      "Back again? I'm not complaining 😌",
+      "Someone's obsessed 👀",
+      "At this point you live here 🏡",
+      "Okay, I'm officially flattered 🙈"
+    ];
+    afterGate(() => {
+      setTimeout(() => toast(hello), 1500);
+      if (visits > 1) setTimeout(() => toast(`Visit #${visits}. ${visitLines[Math.min(visits - 2, visitLines.length - 1)]}`), 6000);
+    });
+  }
+
+  // 2. Tab title changes when she leaves and comes back
+  const title = document.title;
+  let backTimer;
+  document.addEventListener("visibilitychange", () => {
+    clearTimeout(backTimer);
+    if (document.hidden) document.title = "Come back 🥺";
+    else { document.title = "Yay, you're back 💗"; backTimer = setTimeout(() => (document.title = title), 2500); }
+  });
+
+  // 3. Press and hold the ♡ in the logo
+  const logo = document.querySelector(".logo");
+  if (logo) {
+    logo.innerHTML = logo.innerHTML.replace("♡", '<span class="logo-heart">♡</span>');
+    let holdTimer, held = false;
+    const start = () => {
+      held = false;
+      holdTimer = setTimeout(() => {
+        held = true;
+        logo.classList.add("held");
+        toast("Careful… you're holding my heart 🫣");
+        heartRain(1500);
+        setTimeout(() => logo.classList.remove("held"), 1200);
+      }, 800);
+    };
+    const stop = () => clearTimeout(holdTimer);
+    logo.addEventListener("pointerdown", start);
+    logo.addEventListener("pointerup", stop);
+    logo.addEventListener("pointerleave", stop);
+    logo.addEventListener("contextmenu", (e) => e.preventDefault());
+    logo.addEventListener("click", (e) => { if (held) { e.preventDefault(); held = false; } });
+  }
+
+  // 4. Sitting still on a page for a while
+  let idleTimer, idleShown = false;
+  const resetIdle = () => {
+    clearTimeout(idleTimer);
+    if (idleShown) return;
+    idleTimer = setTimeout(() => {
+      if (document.hidden || document.getElementById("gate") || document.getElementById("love")) return resetIdle();
+      idleShown = true;
+      toast("Still here? I like that. 🙈");
+    }, 45000);
+  };
+  ["pointerdown", "keydown", "scroll", "pointermove"].forEach((ev) => addEventListener(ev, resetIdle, { passive: true }));
+  resetIdle();
+
+  // 5. Copying text from the site
+  document.addEventListener("copy", () => toast("Stealing my words? Keep them, they're yours 💌"));
+
+  // 6. Typing "dhruv" on a keyboard (not inside a text box)
+  let typed = "";
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest && e.target.closest("input, textarea")) return;
+    if (e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-5);
+    if (typed === "dhruv") { typed = ""; toast("You called? 👀 I'm one text away."); }
+  });
+});
+
+// ---------- UI polish ----------
+document.addEventListener("DOMContentLoaded", () => {
+  const page = location.pathname.split("/").pop() || "index.html";
+
+  // Remember which pages she has opened, and show progress on the home page.
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem("seenPages")) || []; } catch (e) {}
+  if (!seen.includes(page)) { seen.push(page); try { localStorage.setItem("seenPages", JSON.stringify(seen)); } catch (e) {} }
+  const cards = document.querySelectorAll(".cards .card");
+  if (cards.length) {
+    let done = 0;
+    cards.forEach((c) => {
+      if (seen.includes(c.getAttribute("href"))) { c.classList.add("seen"); done++; }
+    });
+    const p = document.createElement("div");
+    p.className = "explored";
+    p.innerHTML = `<span></span><div class="explored-bar"><div></div></div>`;
+    p.querySelector("span").textContent = done === cards.length
+      ? "You've explored everything 🌸 (but the secrets are still hiding 👀)"
+      : `You've explored ${done} of ${cards.length} 🌸`;
+    p.querySelector(".explored-bar div").style.width = (done / cards.length) * 100 + "%";
+    cards[0].parentElement.before(p);
+  }
+
+  // Gradient ring around her photo on the home page
+  const photo = document.querySelector(".hero-photo");
+  if (photo) {
+    const ring = document.createElement("div");
+    ring.className = "photo-ring";
+    photo.before(ring);
+    ring.appendChild(photo);
+  }
+
+  // Thin progress bar at the top while scrolling
+  const bar = document.createElement("div");
+  bar.id = "scroll-bar";
+  document.body.appendChild(bar);
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (max > 0 ? (scrollY / max) * 100 : 0) + "%";
+  };
+  addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // Phone menu: ☰ turns into ✕, and closes after picking a page or tapping outside
+  const menuBtn = document.querySelector(".menu-btn");
+  const links = document.querySelector(".nav-links");
+  if (menuBtn && links) {
+    const sync = () => (menuBtn.textContent = links.classList.contains("open") ? "✕" : "☰");
+    menuBtn.addEventListener("click", () => setTimeout(sync));
+    links.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => { links.classList.remove("open"); sync(); }));
+    document.addEventListener("click", (e) => {
+      if (links.classList.contains("open") && !e.target.closest("nav")) { links.classList.remove("open"); sync(); }
+    });
+  }
+
+  // Cards tilt a little toward the mouse (computers only)
+  if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll(".card").forEach((c) => {
+      c.addEventListener("pointermove", (e) => {
+        const r = c.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        c.style.transform = `perspective(700px) rotateX(${-y * 10}deg) rotateY(${x * 12}deg) translateY(-6px)`;
+        c.style.setProperty("--mx", (x + 0.5) * 100 + "%");
+        c.style.setProperty("--my", (y + 0.5) * 100 + "%");
+      });
+      c.addEventListener("pointerleave", () => (c.style.transform = ""));
+    });
+  }
 });

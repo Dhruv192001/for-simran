@@ -3,118 +3,324 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🌷</text></svg>" />
+  <link rel="icon" type="image/png" href="images/icon.png" />
+  <link rel="apple-touch-icon" href="images/icon.png" />
   <title>One Small Question</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* The whole proposal plays on one full-screen dark "stage". */
+    body.stage-mode nav, body.stage-mode footer, body.stage-mode #theme-btn,
+    body.stage-mode .golden, body.stage-mode #scroll-bar, body.stage-mode #floaties { display: none !important; }
+    body.stage-mode #mini-player { z-index: 600; opacity: 0.85; }
+    body.stage-mode .rain, body.stage-mode .spark { z-index: 700; }
+
+    #stage {
+      position: fixed; inset: 0; z-index: 500; overflow: hidden; color: #fff;
+      background: radial-gradient(ellipse at 50% 120%, #5a1d55 0%, #24123d 45%, #0b0619 100%);
+      display: grid; place-items: center; text-align: center; padding: 16px;
+      -webkit-user-select: none; user-select: none;
+    }
+    #stage .stars, #stage .stars2 {
+      position: absolute; inset: -50%; pointer-events: none;
+      background-image:
+        radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+        radial-gradient(1px 1px at 90px 120px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 160px 60px, #ffd6e5, transparent),
+        radial-gradient(1px 1px at 220px 180px, #fff, transparent),
+        radial-gradient(1px 1px at 60px 200px, #e5dbff, transparent);
+      background-size: 260px 240px; animation: drift 90s linear infinite; opacity: 0.8;
+    }
+    #stage .stars2 { background-size: 380px 330px; animation-duration: 140s; opacity: 0.5; }
+    @keyframes drift { to { transform: translateY(-240px); } }
+
+    .scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; opacity: 0; visibility: hidden; transition: opacity 0.9s, visibility 0.9s; }
+    .scene.on { opacity: 1; visibility: visible; }
+
+    .intro-name { font-family: "Caveat", cursive; font-size: clamp(64px, 16vw, 130px); color: #ff8fb5; text-shadow: 0 0 40px rgba(255, 120, 170, 0.6); line-height: 1; }
+    .intro-sub { color: #e8d6f0; margin: 14px 0 34px; font-size: 17px; }
+    .glow-btn {
+      border: 0; cursor: pointer; font-family: inherit; font-weight: 700; font-size: 18px; color: #fff;
+      padding: 15px 34px; border-radius: 999px;
+      background: linear-gradient(135deg, #ff6f9f, #b98bff);
+      box-shadow: 0 0 0 0 rgba(255, 111, 159, 0.6), 0 10px 30px rgba(255, 111, 159, 0.35);
+      animation: glowPulse 2.2s ease-in-out infinite; transition: transform 0.2s;
+    }
+    .glow-btn:hover { transform: scale(1.05); }
+    .glow-btn:active { transform: scale(0.96); }
+    @keyframes glowPulse { 50% { box-shadow: 0 0 0 14px rgba(255, 111, 159, 0), 0 10px 40px rgba(255, 111, 159, 0.55); } }
+
+    #line {
+      max-width: 640px; font-family: "Caveat", cursive; font-size: clamp(34px, 7vw, 56px); line-height: 1.2; color: #ffe3ee;
+      text-shadow: 0 0 24px rgba(255, 140, 185, 0.45);
+      opacity: 0; transform: translateY(14px); filter: blur(6px); transition: opacity 1s, transform 1s, filter 1s;
+    }
+    #line.show { opacity: 1; transform: none; filter: none; }
+    .tap-hint-stage { position: absolute; bottom: 26px; left: 0; right: 0; font-size: 13px; color: rgba(255, 255, 255, 0.4); }
+
+    .pola {
+      position: absolute; width: clamp(110px, 26vw, 170px); background: #fff; padding: 8px 8px 26px; border-radius: 4px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+      transition: opacity 0.8s, transform 1s cubic-bezier(.3,1.5,.5,1);
+    }
+    .pola img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; border-radius: 2px; }
+    .pola.in { opacity: 1; }
+    .montage-cap { position: relative; z-index: 2; font-family: "Caveat", cursive; font-size: clamp(32px, 7vw, 50px); color: #fff; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 120, 170, 0.6); opacity: 0; transition: opacity 1s 1.8s; }
+    .scene.on .montage-cap { opacity: 1; }
+
+    .draw-heart { width: min(150px, 38vw); overflow: visible; margin-bottom: 8px; }
+    .draw-heart path { fill: rgba(255, 111, 159, 0); stroke: #ff8fb5; stroke-width: 2.5; stroke-dasharray: 320; stroke-dashoffset: 320; filter: drop-shadow(0 0 8px #ff6f9f); }
+    .scene.on .draw-heart path { animation: drawHeart 2.2s ease forwards, fillHeart 1s ease 2.2s forwards, beat 1.4s ease-in-out 3.2s infinite; transform-origin: center; transform-box: fill-box; }
+    @keyframes drawHeart { to { stroke-dashoffset: 0; } }
+    @keyframes fillHeart { to { fill: rgba(255, 111, 159, 0.9); } }
+    @keyframes beat { 0%, 60%, 100% { transform: scale(1); } 20% { transform: scale(1.12); } 40% { transform: scale(1.04); } }
+
+    .big-q { font-family: "Caveat", cursive; font-size: clamp(52px, 12vw, 104px); line-height: 1.05; color: #ff9cc0; text-shadow: 0 0 30px rgba(255, 120, 170, 0.75), 0 0 80px rgba(185, 139, 255, 0.4); margin: 6px 0 10px; }
+    .big-q .w { display: inline-block; white-space: nowrap; }
+    .big-q .w span { display: inline-block; opacity: 0; animation: qLetter 0.7s ease forwards; }
+    @keyframes qLetter { from { opacity: 0; transform: translateY(24px) scale(0.6); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+    .q-sub, .q-btns, .q-soft { opacity: 0; transition: opacity 1s; }
+    .q-sub { color: #e8d6f0; font-size: 16px; }
+    .q-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 28px; }
+    .q-soft { margin-top: 26px; background: none; border: 0; color: rgba(255, 255, 255, 0.5); font-family: inherit; font-size: 14px; text-decoration: underline; cursor: pointer; }
+    .reveal { opacity: 1 !important; }
+
+    .heart-photo { width: min(240px, 62vw); filter: drop-shadow(0 0 30px rgba(255, 111, 159, 0.8)); animation: beat 1.6s ease-in-out infinite; }
+    .yes-title { font-family: "Caveat", cursive; font-size: clamp(54px, 13vw, 100px); color: #ff9cc0; text-shadow: 0 0 30px rgba(255, 120, 170, 0.75); line-height: 1; margin-top: 10px; }
+    .yes-sub { color: #ffe3ee; font-size: 18px; margin: 10px 0 6px; max-width: 460px; }
+    .day1 { display: inline-block; margin: 10px 0 22px; padding: 6px 16px; border-radius: 999px; border: 1px solid rgba(255, 200, 220, 0.5); color: #ffd6e5; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; }
+    .end-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .end-btns .btn.ghost { background: rgba(255, 255, 255, 0.12); color: #fff; }
+
+    #fireworks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    #stage .scene-yes, #stage .scene-time { overflow-y: auto; }
+  </style>
 </head>
-<body>
+<body class="stage-mode">
   <nav>
     <a href="index.html" class="logo">for Simran ♡</a>
     <button class="menu-btn" aria-label="Menu">☰</button>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
-      <li><a href="reasons.html">Reasons</a></li>
-      <li><a href="memories.html">Memories</a></li>
-      <li><a href="openwhen.html">Open When</a></li>
-      <li><a href="smile.html">Smile Zone</a></li>
-      <li><a href="quiz.html">Quiz</a></li>
-      <li><a href="gifts.html">Gifts</a></li>
-      <li><a href="letter.html">A Letter</a></li>
     </ul>
   </nav>
 
-  <main>
-    <div class="ask">
-      <!-- Step 1: a gentle heads-up -->
-      <div class="ask-step show" id="step1">
-        <div class="page-title">
-          <h1>One small question…</h1>
-          <p>Only if you feel like it. You can close this page and nothing changes. 🌷</p>
-        </div>
-        <button class="btn" id="ready">Okay, I'm ready 🙈</button>
-      </div>
+  <div id="stage">
+    <div class="stars"></div><div class="stars2"></div>
+    <canvas id="fireworks"></canvas>
 
-      <!-- Step 2: the question. ✏️ Change the words to sound like you. -->
-      <div class="ask-step" id="step2">
-        <div class="letter-paper">
-          <p>Simran,</p>
-          <p>You already know I'm in your corner. That part isn't going anywhere, no matter what you say next.</p>
-          <p>But I'd be lying if I said that's all I feel. Somewhere between the late-night talks and the dumb jokes, you became my favourite person.</p>
-          <p>So whenever you're ready, and only then:</p>
-          <p class="ask-q">Can I be a little more than just a friend to you? 💗</p>
-          <div class="ask-btns">
-            <button class="btn" data-answer="yes">Yes 💗</button>
-            <button class="btn ghost" data-answer="time">I need some time 🌙</button>
-            <button class="btn ghost" data-answer="friends">Let's stay just like this 🤍</button>
-          </div>
-        </div>
-      </div>
+    <!-- 1. Intro -->
+    <section class="scene on" id="s-intro">
+      <div class="intro-name">Simran…</div>
+      <p class="intro-sub">I made one more thing. Turn the volume up a little 🎧</p>
+      <button class="glow-btn" id="begin">Tap to begin ✨</button>
+    </section>
 
-      <!-- Step 3: whatever she says, a kind reply -->
-      <div class="ask-answer" id="ans-yes">
-        <div class="page-title">
-          <h1>Okay wow 🥹</h1>
-          <p>I'm probably smiling like an idiot right now. Thank you for trusting me with this.</p>
-        </div>
-        <div class="next-link"><a class="btn" data-wa="Hey Dhruv… I said yes 💗">Tell me yourself 💬</a></div>
-      </div>
-      <div class="ask-answer" id="ans-time">
-        <div class="page-title">
-          <h1>Take all the time you need 🌙</h1>
-          <p>No rush. No deadline. I'm not going anywhere, and nothing between us changes.</p>
-        </div>
-        <div class="next-link"><a class="btn" data-wa="Hey Dhruv, I read it. Give me some time, okay? 🌙">Let me know you saw it 💬</a></div>
-      </div>
-      <div class="ask-answer" id="ans-friends">
-        <div class="page-title">
-          <h1>Always, then 🤍</h1>
-          <p>Thank you for being honest. I meant it: still in your corner, still sending bad memes, still here.</p>
-        </div>
-        <div class="next-link"><a class="btn" data-wa="Hey Dhruv, I read it. Still us? 🤍">Text me 💬</a></div>
-      </div>
+    <!-- 2. The story, one line at a time -->
+    <section class="scene" id="s-lines">
+      <p id="line"></p>
+      <p class="tap-hint-stage">tap to skip ahead</p>
+    </section>
 
-      <div class="next-link" id="home" style="display:none"><a href="index.html" class="btn ghost">Back to the start 🏠</a></div>
-    </div>
-  </main>
+    <!-- 3. Her photos -->
+    <section class="scene" id="s-montage">
+      <p class="montage-cap">Every version of you…<br />I'm a fan of all of them.</p>
+    </section>
 
-  <footer>♡</footer>
+    <!-- 4. The question -->
+    <section class="scene" id="s-question">
+      <svg class="draw-heart" viewBox="0 0 100 92" aria-hidden="true">
+        <path d="M50 88 C 22 68, 3 50, 3 28 C 3 13, 15 3, 28 3 C 38 3, 46 9, 50 18 C 54 9, 62 3, 72 3 C 85 3, 97 13, 97 28 C 97 50, 78 68, 50 88 Z" />
+      </svg>
+      <h1 class="big-q" id="bigQ"></h1>
+      <p class="q-sub" id="qSub">(no pressure… but also, please say yes 🥺)</p>
+      <div class="q-btns" id="qBtns">
+        <button class="glow-btn" data-answer="yes">Yes 💗</button>
+        <button class="glow-btn" data-answer="obvious" style="background:linear-gradient(135deg,#b98bff,#ff8fb5)">Obviously yes 😌</button>
+      </div>
+      <button class="q-soft" id="qSoft" data-answer="time">I need a little time 🌙</button>
+    </section>
+
+    <!-- 5a. She said yes -->
+    <section class="scene scene-yes" id="s-yes">
+      <svg class="heart-photo" viewBox="0 0 100 92" aria-label="Simran">
+        <defs><clipPath id="hp"><path d="M50 88 C 22 68, 3 50, 3 28 C 3 13, 15 3, 28 3 C 38 3, 46 9, 50 18 C 54 9, 62 3, 72 3 C 85 3, 97 13, 97 28 C 97 50, 78 68, 50 88 Z" /></clipPath></defs>
+        <image href="images/simran.jpg" x="0" y="-4" width="100" height="100" preserveAspectRatio="xMidYMid slice" clip-path="url(#hp)" />
+        <path d="M50 88 C 22 68, 3 50, 3 28 C 3 13, 15 3, 28 3 C 38 3, 46 9, 50 18 C 54 9, 62 3, 72 3 C 85 3, 97 13, 97 28 C 97 50, 78 68, 50 88 Z" fill="none" stroke="#fff" stroke-width="2" />
+      </svg>
+      <div class="yes-title" id="yesTitle"></div>
+      <p class="yes-sub" id="yesSub"></p>
+      <span class="day1" id="day1"></span>
+      <div class="end-btns">
+        <a class="btn" id="tellMe">Tell me yourself 💬</a>
+        <a href="index.html" class="btn ghost">Back to our little world 🏠</a>
+      </div>
+    </section>
+
+    <!-- 5b. She needs time -->
+    <section class="scene scene-time" id="s-time">
+      <div class="yes-title" style="font-size:clamp(46px,11vw,84px)">Take all the time you need 🌙</div>
+      <p class="yes-sub">No rush. No deadline. I'm not going anywhere, and nothing between us changes. I'll still pick you up. Ulta route and all. 🏍️</p>
+      <div class="end-btns" style="margin-top:22px">
+        <a class="btn" data-wa="Hey Dhruv, I saw it 🌙 Give me a little time, okay?">Let me know you saw it 💬</a>
+        <a href="index.html" class="btn ghost">Back to our little world 🏠</a>
+      </div>
+    </section>
+  </div>
 
   <script src="main.js"></script>
   <script>
+    // ✏️ The story lines. Change them to sound like you.
+    const LINES = [
+      "Remember how this started? Random talks. Memes. Nothing serious.",
+      "Then somewhere along the way… you became my favourite notification.",
+      "The back seat of my bike started feeling empty without you.",
+      "And every \"ulta route\" turned into my favourite road.",
+      "So I stopped pretending. Here's the truth…"
+    ];
+    // ✏️ Photos for the montage (from the images folder).
+    const PHOTOS = ["images/photo2.jpg", "images/photo9.jpg", "images/photo3.jpg", "images/photo12.jpg", "images/photo8.jpg", "images/photo15.jpg"];
+    // ✏️ The question itself.
+    const QUESTION = "Simran, will you be mine?";
+    // ✏️ What shows after each button: title, line, and the WhatsApp message I get.
+    const ANSWERS = {
+      yes: ["She said yes 🥹", "Best. Decision. Ever. It's official now: you're stuck with me, and the back seat is permanently yours. 🏍️💗", "YES. 💗"],
+      obvious: ["Obviously?! 😏", "Okay, the confidence. I love that. Guess I was the only one who didn't know. Back seat: yours. Forever. No take-backs. 🏍️💗", "Obviously YES 😌💗 Did you even need to ask?"]
+    };
+
     const $ = (id) => document.getElementById(id);
-    $("ready").addEventListener("click", () => {
-      $("step1").classList.remove("show");
-      $("step2").classList.add("show");
+    const stage = $("stage");
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    // Waits ms, or less if she taps the screen.
+    const waitOrTap = (ms) => new Promise((res) => {
+      const done = () => { clearTimeout(t); stage.removeEventListener("click", done); res(); };
+      const t = setTimeout(done, ms);
+      setTimeout(() => stage.addEventListener("click", done), 250);
+    });
+    function show(id) {
+      document.querySelectorAll(".scene").forEach((s) => s.classList.toggle("on", s.id === id));
+    }
+
+    // Preload photos so the montage doesn't pop in late
+    PHOTOS.forEach((p) => (new Image().src = p));
+
+    $("begin").addEventListener("click", async (e) => {
+      e.stopPropagation();
+      // Story lines
+      show("s-lines");
+      await sleep(900);
+      const line = $("line");
+      for (const text of LINES) {
+        line.textContent = text;
+        line.classList.add("show");
+        await waitOrTap(1800 + text.length * 40);
+        line.classList.remove("show");
+        await sleep(900);
+      }
+
+      // Photo montage: polaroids fly in around the centre
+      show("s-montage");
+      const scene = $("s-montage");
+      const spots = [[22, 28, -12], [78, 26, 10], [16, 70, 8], [84, 72, -9], [50, 18, -4], [50, 82, 5]];
+      PHOTOS.forEach((src, i) => {
+        const p = document.createElement("div");
+        p.className = "pola";
+        p.innerHTML = `<img alt="" src="${src}" />`;
+        p.querySelector("img").onerror = () => p.remove();
+        const [x, y, r] = spots[i % spots.length];
+        p.style.left = x + "%";
+        p.style.top = y + "%";
+        scene.appendChild(p);
+        setTimeout(() => {
+          p.classList.add("in");
+          p.style.transform = `translate(-50%, -50%) scale(1) rotate(${r}deg)`;
+        }, 300 + i * 350);
+      });
+      await waitOrTap(6500);
+
+      // The question
+      show("s-question");
+      const q = $("bigQ");
+      let k = 0;
+      const start = 2.6; // seconds, after the heart is drawn
+      QUESTION.split(" ").forEach((word, w) => {
+        if (w) { q.appendChild(document.createTextNode(" ")); k++; }
+        const we = document.createElement("span");
+        we.className = "w";
+        [...word].forEach((ch) => {
+          const s = document.createElement("span");
+          s.textContent = ch;
+          s.style.animationDelay = start + k++ * 0.09 + "s";
+          we.appendChild(s);
+        });
+        q.appendChild(we);
+      });
+      const after = (start + k * 0.09) * 1000;
+      setTimeout(() => $("qSub").classList.add("reveal"), after + 400);
+      setTimeout(() => $("qBtns").classList.add("reveal"), after + 1200);
+      setTimeout(() => $("qSoft").classList.add("reveal"), after + 2600);
     });
 
     document.querySelectorAll("[data-answer]").forEach((b) => {
-      b.addEventListener("click", () => {
-        const a = b.dataset.answer;
-        $("step2").classList.remove("show");
-        $("ans-" + a).classList.add("show");
-        $("home").style.display = "flex";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        if (a === "yes") { burst(); heartRain(7000); }
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const ans = ANSWERS[b.dataset.answer];
+        if (ans) {
+          $("yesTitle").textContent = ans[0];
+          $("yesSub").textContent = ans[1];
+          const today = new Date().toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+          let day = today;
+          try { day = localStorage.getItem("day1") || today; localStorage.setItem("day1", day); } catch (err) {}
+          $("day1").textContent = `Day 1 of us · ${day}`;
+          const url = waLink(`${ans[2]} (Day 1 of us · ${day})`);
+          if (url) { $("tellMe").href = url; $("tellMe").target = "_blank"; $("tellMe").rel = "noopener"; } else $("tellMe").remove();
+          show("s-yes");
+          fireworks(9000);
+          setTimeout(() => heartRain(6000), 600);
+        } else {
+          show("s-time");
+        }
       });
     });
 
-    function burst() {
-      for (let i = 0; i < 50; i++) {
-        const h = document.createElement("span");
-        h.className = "spark";
-        h.textContent = ["💗", "💕", "🌸", "✨", "🥹"][i % 5];
-        h.style.fontSize = 18 + Math.random() * 20 + "px";
-        h.style.left = innerWidth / 2 + "px";
-        h.style.top = innerHeight / 3 + "px";
-        const ang = Math.random() * Math.PI * 2, d = 100 + Math.random() * 260;
-        h.style.setProperty("--dx", Math.cos(ang) * d + "px");
-        h.style.setProperty("--dy", Math.sin(ang) * d + "px");
-        h.style.animationDuration = "1.8s";
-        document.body.appendChild(h);
-        setTimeout(() => h.remove(), 1800);
+    // ---------- Fireworks ----------
+    function fireworks(ms) {
+      const c = $("fireworks"), ctx = c.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const resize = () => { c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+      resize();
+      const colors = ["#ff6f9f", "#ffb3cf", "#ffd36e", "#b98bff", "#ffffff", "#ff9a76"];
+      let parts = [];
+      const end = Date.now() + ms;
+      function boom() {
+        const x = innerWidth * (0.15 + Math.random() * 0.7), y = innerHeight * (0.12 + Math.random() * 0.4);
+        const col = colors[Math.floor(Math.random() * colors.length)];
+        const n = 70;
+        for (let i = 0; i < n; i++) {
+          const a = (Math.PI * 2 * i) / n, sp = 2 + Math.random() * 3.5;
+          parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, col });
+        }
       }
+      const launcher = setInterval(() => { if (Date.now() > end) return clearInterval(launcher); boom(); if (Math.random() < 0.4) boom(); }, 450);
+      boom();
+      (function frame() {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.fillRect(0, 0, innerWidth, innerHeight);
+        ctx.globalCompositeOperation = "lighter";
+        parts = parts.filter((p) => p.life > 0);
+        for (const p of parts) {
+          p.x += p.vx; p.y += p.vy; p.vy += 0.045; p.vx *= 0.985; p.vy *= 0.985; p.life -= 0.013;
+          ctx.globalAlpha = Math.max(p.life, 0);
+          ctx.fillStyle = p.col;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        if (Date.now() < end + 3000 || parts.length) requestAnimationFrame(frame);
+        else ctx.clearRect(0, 0, innerWidth, innerHeight);
+      })();
     }
   </script>
 </body>
