@@ -29,8 +29,35 @@
   <main>
     <div class="page-title">
       <h1>Little memories</h1>
-      <p>Moments that made life a bit brighter. Tap any photo to see it big.</p>
+      <p>Words, photos, and plans. Tap anything to open it.</p>
     </div>
+    <!-- ✏️ Our moments: each <article> becomes a card that opens the full letter. Copy one block to add a new day (newest on top). -->
+    <section class="moments">
+      <article class="moment fade-in">
+        <div class="letter-paper">
+          <span class="moment-date">13 November 2026 · the ride 🏍️</span>
+          <h2>The ride I'll never forget</h2>
+          <p>Yesterday I dropped you home. Normal day, normal road. Or so I thought.</p>
+          <p>Then you hugged me from behind. And something strange happened.</p>
+          <p>Everything I'd been carrying went quiet. The stress, the overthinking, the past, whatever the future is planning. All of it, just… gone.</p>
+          <p>No yesterday. No tomorrow. Just the road, the wind, and your arms around me.</p>
+          <p>For those few minutes the whole world was two people on one bike. Just you and me. Nothing else existed.</p>
+          <p>I've ridden that road so many times. Yesterday was the first time I didn't want it to end.</p>
+          <p>So if you ever wonder what you mean to me, it's that. You make everything else disappear. 💗</p>
+          <p class="sign">— Dhruv</p>
+        </div>
+      </article>
+      <!-- ✏️ Bucket list card: edit the BUCKET list in the script below. -->
+      <article class="moment fade-in">
+        <button class="moment-card bucket-card" id="bucketCard">
+          <span class="moment-date">next up 🏍️</span>
+          <h3>Memories we haven't made yet</h3>
+          <p id="bucketCardCount"></p>
+          <span class="moment-open">Open the list 📝</span>
+        </button>
+      </article>
+    </section>
+
     <div class="story-btn"><button class="btn" id="playStory">Play the Simran show ✨</button></div>
     <div class="gallery" id="gallery"></div>
 
@@ -38,6 +65,24 @@
   </main>
 
   <footer>more memories loading… 🌷</footer>
+
+  <div class="modal" id="bucketModal">
+    <div class="letter-paper bucket">
+      <button class="close-x" id="bkClose" aria-label="Close">×</button>
+      <span class="moment-date">next up 🏍️</span>
+      <h2>Memories we haven't made yet</h2>
+      <p class="bucket-sub">Tick one off when we do it. Or tap “let's do this” and I'll plan it.</p>
+      <div class="bucket-count" id="bucketCount"></div>
+      <ul class="bucket-list" id="bucketList"></ul>
+    </div>
+  </div>
+
+  <div class="modal" id="momentModal">
+    <div class="letter-paper">
+      <button class="close-x" id="mmClose" aria-label="Close">×</button>
+      <div id="mmBody"></div>
+    </div>
+  </div>
 
   <div class="lightbox" id="lightbox">
     <button class="close-x lb-close" aria-label="Close">✕</button>
@@ -50,6 +95,86 @@
 
   <script src="main.js"></script>
   <script>
+    // Written moments: each <article> shows as a small card; tap it to open the full letter.
+    (function moments() {
+      const modal = document.getElementById("momentModal");
+      const body = document.getElementById("mmBody");
+      document.querySelectorAll(".moment").forEach((m) => {
+        const paper = m.querySelector(".letter-paper");
+        if (!paper) return;
+        const date = paper.querySelector(".moment-date");
+        const title = paper.querySelector("h2");
+        const first = paper.querySelector("p:not(.sign)");
+        const card = document.createElement("button");
+        card.className = "moment-card";
+        card.innerHTML = `<span class="moment-date"></span><h3></h3><p></p><span class="moment-open">Open 💌</span>`;
+        card.querySelector(".moment-date").textContent = date ? date.textContent : "";
+        card.querySelector("h3").textContent = title ? title.textContent : "";
+        card.querySelector("p").textContent = first ? first.textContent : "";
+        card.addEventListener("click", () => {
+          body.innerHTML = paper.innerHTML;
+          modal.classList.add("open");
+          modal.querySelector(".letter-paper").scrollTop = 0;
+          m.classList.add("read");
+        });
+        m.prepend(card);
+      });
+      const close = () => modal.classList.remove("open");
+      document.getElementById("mmClose").addEventListener("click", close);
+      modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    })();
+
+    // ✏️ Bucket list: emoji + the plan. Add, remove, change anything.
+    const BUCKET = [
+      ["🌅", "A long ride with no destination. Just us and the road."],
+      ["☕", "Chai at some random tapri at 11pm"],
+      ["🌧️", "Get caught in the rain on the bike. On purpose."],
+      ["🌄", "Watch a sunrise together (yes, you'll have to wake up early)"],
+      ["🍜", "Try a food place neither of us has been to"],
+      ["📸", "Finally take a photo together. A proper one."],
+      ["🎡", "Go to a mela and win you something useless"],
+      ["🌌", "Stargazing somewhere quiet, away from the city lights"],
+      ["🍳", "Cook something together (and probably ruin it)"],
+      ["🎶", "One full ride with our playlist on"]
+    ];
+    (function bucket() {
+      let done = [];
+      try { done = JSON.parse(localStorage.getItem("bucketDone")) || []; } catch (e) {}
+      const list = document.getElementById("bucketList");
+      const count = document.getElementById("bucketCount");
+      function render() {
+        list.innerHTML = "";
+        BUCKET.forEach(([emoji, text], k) => {
+          const isDone = done.includes(k);
+          const li = document.createElement("li");
+          li.className = "bucket-item" + (isDone ? " done" : "");
+          li.innerHTML = `<button class="bucket-check" aria-label="tick"></button><span class="bucket-emoji"></span><span class="bucket-text"></span>`;
+          li.querySelector(".bucket-check").textContent = isDone ? "✓" : "";
+          li.querySelector(".bucket-emoji").textContent = emoji;
+          li.querySelector(".bucket-text").textContent = text;
+          li.querySelector(".bucket-check").addEventListener("click", () => {
+            done = isDone ? done.filter((x) => x !== k) : done.concat(k);
+            try { localStorage.setItem("bucketDone", JSON.stringify(done)); } catch (e) {}
+            if (!isDone) { heartRain(1500); toast("One more memory made. 💗"); }
+            render();
+          });
+          const url = !isDone && waLink(`Let's do this one: ${emoji} ${text} 😌`);
+          if (url) li.insertAdjacentHTML("beforeend", `<a class="bucket-go" target="_blank" rel="noopener" href="${url}">let's do this →</a>`);
+          list.appendChild(li);
+        });
+        count.textContent = `${done.length} of ${BUCKET.length} done` + (done.length === BUCKET.length ? " · time to write a new list 🥹" : "");
+        document.getElementById("bucketCardCount").textContent = `${BUCKET.length} plans · ${done.length} done so far` + (done.length ? " 💗" : ". Let's change that 😌");
+      }
+      render();
+      const bm = document.getElementById("bucketModal");
+      document.getElementById("bucketCard").addEventListener("click", () => { bm.classList.add("open"); bm.querySelector(".letter-paper").scrollTop = 0; });
+      const bclose = () => bm.classList.remove("open");
+      document.getElementById("bkClose").addEventListener("click", bclose);
+      bm.addEventListener("click", (e) => { if (e.target === bm) bclose(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") bclose(); });
+    })();
+
     // ✏️ Put photos in the images/ folder and list them here with a caption.
     // Any file that's missing shows a cute placeholder instead.
     const photos = [

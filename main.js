@@ -633,3 +633,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ---------- "Miss you" button 💭 ----------
+// Sits next to the golden heart. Tap it: a cute line from me + a button to tell me.
+// ✏️ Change these lines any time.
+const MISS_LINES = [
+  "Funny. I was just thinking about you too. 🙈",
+  "Missing me? Bold of you to admit it. 😌",
+  "Same. Honestly, same. 💗",
+  "I'm probably smiling at my phone right now. Because of you.",
+  "Say the word and the bike is on its way. 🏍️",
+  "Close your eyes. That's me, sitting right next to you. 🤍",
+  "You crossed my mind. Again. It's a habit now.",
+  "Distance is temporary. This feeling isn't. 💫"
+];
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.body.classList.contains("stage-mode")) return;
+  const btn = document.createElement("button");
+  btn.className = "miss-btn";
+  btn.setAttribute("aria-label", "miss me?");
+  btn.textContent = "💭";
+  const pop = document.createElement("div");
+  pop.className = "miss-pop";
+  pop.innerHTML = `<p></p>`;
+  const url = waLink("thinking about you 🙈💭");
+  if (url) pop.insertAdjacentHTML("beforeend", `<a class="btn" target="_blank" rel="noopener" href="${url}">Tell him 💬</a>`);
+  let last = -1;
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (pop.classList.contains("open")) return pop.classList.remove("open");
+    let k;
+    do { k = Math.floor(Math.random() * MISS_LINES.length); } while (MISS_LINES.length > 1 && k === last);
+    last = k;
+    pop.querySelector("p").textContent = MISS_LINES[k];
+    pop.classList.add("open");
+  });
+  document.addEventListener("click", (e) => { if (!pop.contains(e.target)) pop.classList.remove("open"); });
+  document.body.appendChild(btn);
+  document.body.appendChild(pop);
+});

@@ -46,10 +46,33 @@
     </div>
   </div>
 
+  <div id="sit" aria-hidden="true">
+    <div class="sit-heart">🤍</div>
+    <p class="sit-line" id="sitLine"></p>
+    <div class="sit-btns">
+      <a class="btn" id="sitText" target="_blank" rel="noopener">Text me 💬</a>
+      <button class="btn ghost" id="sitDone">I'm okay now 🌷</button>
+    </div>
+  </div>
+
   <script src="main.js"></script>
   <script>
     // ✏️ Edit these letters — your own words will mean the most.
     const letters = [
+      {
+        label: "you want to be alone",
+        title: "You don't have to face it alone 🤍",
+        body: [
+          "I know how it gets when you're by yourself. It goes quiet outside, and then everything comes back. Every person who ever cried in front of you, every heavy moment you held for someone else. All of it, at once.",
+          "And you've always handled it the same way. Alone. Quietly. Until you're calm again. You're so strong for that. But you shouldn't have to be strong alone every single time.",
+          "I'm not asking you to stop needing your space. Take it. It's yours. I just want you to know that alone doesn't have to mean lonely anymore.",
+          "I might not be able to fix it. I might not even know the right thing to say. But I can sit next to you. I can stay quiet with you. I can hold your hand while it passes.",
+          "Whatever comes up in your head, we'll face it together. You and me. Always. 🫂",
+          "So next time it gets loud in there, just send me one word. You don't have to explain anything. I'll be there."
+        ],
+        sitWa: "hey… it's getting loud in my head. stay with me? 🤍",
+        sit: true
+      },
       {
         label: "you think I'm going out of my way",
         title: "It's not out of my way 🏍️",
@@ -181,11 +204,58 @@
         const url = l.wa && waLink(l.wa);
         if (url) body.insertAdjacentHTML("beforeend", `<p class="wa-wrap"><a class="btn" target="_blank" rel="noopener" href="${url}">Text me 💬</a></p>`);
         if (l.breathe) startBreathing(body);
+        if (l.sit) {
+          body.insertAdjacentHTML("beforeend", `<p class="wa-wrap"><button class="btn" id="sitBtn">Sit with me for a bit 🤍</button></p>`);
+          body.querySelector("#sitBtn").addEventListener("click", () => startSit(l.sitWa));
+        }
         modal.classList.add("open");
         env.classList.add("read");
       });
       wrap.appendChild(env);
     });
+    // ✏️ "Sit with me": quiet screen, one soft line at a time.
+    const SIT_LINES = [
+      "Hey. I'm right here.",
+      "You don't have to say anything.",
+      "Just breathe. Slowly. With the heart.",
+      "Whatever you're hearing right now, it's not happening anymore.",
+      "You're safe. You're here. With me.",
+      "You held everyone else's tears. Let me hold you for a bit.",
+      "Take all the time you need. I'm not going anywhere.",
+      "Still here. 🤍"
+    ];
+    const sit = document.getElementById("sit");
+    let sitTimer;
+    function startSit(waText) {
+      close();
+      const t = document.getElementById("sitText");
+      const url = waText && waLink(waText);
+      if (url) { t.href = url; t.style.display = ""; } else t.style.display = "none";
+      let k = 0;
+      const line = document.getElementById("sitLine");
+      const next = () => {
+        line.classList.remove("show");
+        setTimeout(() => {
+          line.textContent = SIT_LINES[k];
+          line.classList.add("show");
+          k = k < SIT_LINES.length - 1 ? k + 1 : 4; // after the last one, keep gently looping
+          sitTimer = setTimeout(next, 6000);
+        }, 900);
+      };
+      sit.classList.add("open");
+      next();
+    }
+    document.getElementById("sitDone").addEventListener("click", () => {
+      clearTimeout(sitTimer);
+      const line = document.getElementById("sitLine");
+      line.classList.remove("show");
+      setTimeout(() => {
+        line.textContent = "Proud of you. You didn't face it alone this time. 🌷";
+        line.classList.add("show");
+        setTimeout(() => sit.classList.remove("open"), 3500);
+      }, 900);
+    });
+
     const close = () => { modal.classList.remove("open"); clearTimeout(breatheTimer); };
     document.getElementById("close").addEventListener("click", close);
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
