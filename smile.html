@@ -32,6 +32,16 @@
       <p>Warning: side effects may include giggling. 😄</p>
     </div>
 
+    <!-- 🎮 Game corner: each card opens a game full-screen. Edit the lists in the script at the bottom. -->
+    <section class="games fade-in">
+      <h2>Game corner 🎮</h2>
+      <div class="game-cards">
+        <button class="game-card" data-game="ride"><span class="gc-emoji">🏍️</span><b>Back seat ride</b><small>Catch the hearts, dodge the potholes</small><em class="gc-best" id="best-ride"></em></button>
+        <button class="game-card" data-game="tot"><span class="gc-emoji">🤔</span><b>This or That</b><small>Pick one. No thinking allowed.</small><em class="gc-best" id="best-tot"></em></button>
+        <button class="game-card" data-game="puzzle"><span class="gc-emoji">🧩</span><b>Photo puzzle</b><small>Put the pretty face back together</small><em class="gc-best" id="best-puzzle"></em></button>
+      </div>
+    </section>
+
     <div class="smile-grid">
       <div class="box">
         <h2>Mood check 🌡️</h2>
@@ -80,7 +90,16 @@
 
   <footer>smiling yet? 👀</footer>
 
+  <div id="game" aria-hidden="true">
+    <div class="game-box">
+      <button class="close-x" id="gameClose" aria-label="Close">×</button>
+      <h2 id="gameTitle"></h2>
+      <div id="gameBody"></div>
+    </div>
+  </div>
+
   <script src="main.js"></script>
+  <script src="games.js"></script>
   <script>
     const pick = (arr, last) => { let x; do { x = arr[Math.floor(Math.random() * arr.length)]; } while (arr.length > 1 && x === last); return x; };
     const swap = (el, text) => { el.classList.remove("swap"); void el.offsetWidth; el.textContent = text; el.classList.add("swap"); };

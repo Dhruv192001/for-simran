@@ -751,3 +751,96 @@ body.night .moment-card { color: #4a2c3a; }
   .polaroid figcaption { font-size: 16px; margin-top: 6px; line-height: 1.2; }
   #bucketModal .letter-paper { padding: 30px 16px 20px; }
 }
+
+/* Gallery v2: JS masonry columns (stable on iPhone), images keep their space */
+.gallery { columns: auto; display: flex; gap: 26px; align-items: flex-start; }
+.gallery-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.polaroid { position: relative; -webkit-tap-highlight-color: transparent; will-change: auto; }
+.polaroid img { width: 100%; height: auto; background: #f6e8ee; }
+.polaroid:hover { position: relative; }
+.gallery-col .polaroid:nth-child(odd) { transform: rotate(-1.6deg); }
+.gallery-col .polaroid:nth-child(even) { transform: rotate(1.6deg); }
+.gallery-col:nth-child(even) .polaroid:nth-child(odd) { transform: rotate(1.6deg); }
+.gallery-col:nth-child(even) .polaroid:nth-child(even) { transform: rotate(-1.6deg); }
+@media (hover: hover) {
+  .gallery-col .polaroid:hover { transform: rotate(0) scale(1.03); z-index: 2; }
+}
+@media (hover: none) {
+  .gallery-col .polaroid:active { transform: scale(0.98); }
+}
+@media (max-width: 560px) {
+  .gallery { gap: 12px; }
+}
+
+/* ---------- Game corner (Smile Zone) ---------- */
+.games { max-width: 900px; margin: 0 auto 34px; text-align: center; }
+.games > h2 { font-size: 38px; color: var(--pink-deep); margin-bottom: 14px; }
+.game-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.game-card {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: 0; cursor: pointer; font: inherit; color: var(--ink); padding: 20px 14px 18px; border-radius: var(--radius);
+  background: var(--card); box-shadow: var(--shadow); transition: transform 0.25s;
+}
+.game-card:hover { transform: translateY(-4px) rotate(-1deg); }
+.game-card:active { transform: scale(0.97); }
+.gc-emoji { font-size: 40px; line-height: 1.1; margin-bottom: 4px; }
+.game-card b { font-size: 17px; }
+.game-card small { color: var(--muted); font-size: 13px; line-height: 1.35; }
+.gc-best { font-style: normal; font-size: 12px; font-weight: 700; color: var(--pink-deep); min-height: 1em; margin-top: 4px; }
+@media (max-width: 640px) {
+  .game-cards { grid-template-columns: 1fr; gap: 10px; }
+  .game-card { flex-direction: row; flex-wrap: wrap; text-align: left; padding: 14px 16px; column-gap: 12px; align-items: center; }
+  .gc-emoji { font-size: 32px; margin: 0; grid-row: span 2; }
+  .game-card b, .game-card small { flex: 1 1 60%; }
+  .game-card small { order: 3; flex-basis: 100%; padding-left: 44px; }
+  .gc-best { position: absolute; top: 12px; right: 14px; margin: 0; }
+}
+
+#game {
+  position: fixed; inset: 0; z-index: 250; display: none; align-items: center; justify-content: center;
+  padding: 12px; background: rgba(40, 15, 28, 0.6); backdrop-filter: blur(4px);
+}
+#game.open { display: flex; }
+body:has(#game.open) .toast { display: none; }
+.game-box {
+  position: relative; width: 100%; max-width: 460px; max-height: calc(100dvh - 24px); overflow-y: auto;
+  background: #fffaf6; color: #4a2c3a; border-radius: 22px; padding: 22px 18px 20px; text-align: center;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+}
+.game-box h2 { font-family: "Caveat", cursive; font-size: 34px; color: var(--pink-deep); margin: 0 30px 4px; }
+.game-sub { color: #8a6878; font-size: 14px; margin: 0 0 12px; }
+.game-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
+.game-btns .btn { padding: 10px 18px; font-size: 14px; }
+.game-box .btn.ghost { color: var(--pink-deep); }
+
+/* ride */
+.ride-hud { display: flex; justify-content: space-between; font-weight: 700; color: var(--pink-deep); margin: 0 4px 8px; }
+.ride-wrap { position: relative; border-radius: 16px; overflow: hidden; background: linear-gradient(#9b8bb4, #6d6185); }
+#rideCanvas { display: block; width: 100%; height: min(58dvh, 440px); touch-action: none; cursor: grab; }
+.ride-msg { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255, 250, 246, 0.55); padding: 16px; }
+.ride-end { background: #fffaf6; border-radius: 18px; padding: 18px 16px; box-shadow: var(--shadow); }
+.ride-end .big { font-family: "Caveat", cursive; font-size: 46px; color: var(--pink-deep); line-height: 1; }
+.ride-end p { margin: 8px 0 0; font-weight: 600; }
+
+/* this or that */
+.tot { display: grid; gap: 10px; margin: 6px 0; }
+.tot-opt {
+  border: 2px solid #ffd0de; background: #fff; color: #4a2c3a; font: inherit; font-size: 20px; font-weight: 700;
+  padding: 22px 14px; border-radius: 18px; cursor: pointer; transition: transform 0.2s, background 0.2s, border-color 0.2s;
+}
+.tot-opt:hover { border-color: var(--pink); }
+.tot-opt.picked { background: linear-gradient(135deg, var(--pink), var(--lav)); color: #fff; border-color: transparent; transform: scale(1.03); }
+.tot-opt:disabled:not(.picked) { opacity: 0.45; }
+.tot-or { font-family: "Caveat", cursive; font-size: 26px; color: var(--muted); }
+.tot-react { font-weight: 700; color: var(--pink-deep); min-height: 1.4em; margin: 10px 0 0; }
+.tot-list { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.tot-list li { background: #ffe9f0; border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 14px; }
+.tot-end { font-family: "Caveat", cursive; font-size: 24px; color: var(--pink-deep); margin: 10px 0 0; }
+
+/* puzzle */
+.puzzle { display: grid; gap: 3px; margin: 0 auto; background: #f3dfe6; border-radius: 12px; overflow: hidden; padding: 3px; }
+.puzzle .piece { border: 0; padding: 0; cursor: pointer; border-radius: 4px; background-repeat: no-repeat; transition: transform 0.15s, box-shadow 0.15s; }
+.puzzle .piece.sel { transform: scale(0.92); box-shadow: 0 0 0 3px var(--pink-deep); }
+.puzzle.solved { gap: 0; padding: 0; transition: gap 0.4s; }
+.puzzle.solved .piece { border-radius: 0; cursor: default; }
+.puzzle-done { min-height: 1.4em; margin-top: 12px; font-weight: 600; color: var(--pink-deep); line-height: 1.5; }

@@ -203,13 +203,27 @@
     const good = []; // photos that loaded, in order
     let cur = 0, timer = null;
 
+    // Photo sizes (width, height) so each polaroid keeps its space before it loads: no jumping.
+    // New photo? It still works without an entry here, it just guesses a portrait shape.
+    const SIZES = {"photo1":[341,600],"photo10":[519,600],"photo11":[338,600],"photo12":[342,600],"photo13":[368,600],"photo14":[366,600],"photo15":[355,600],"photo16":[450,600],"photo17":[600,527],"photo2":[340,600],"photo3":[338,600],"photo4":[365,600],"photo5":[339,600],"photo6":[337,600],"photo7":[364,600],"photo8":[338,600],"photo9":[338,600]};
+    const sizeOf = (src) => SIZES[src.split("/").pop().replace(/\.\w+$/, "")] || [3, 5];
+    const figs = [];
+
     photos.forEach(([src, caption]) => {
       const fig = document.createElement("figure");
       fig.className = "polaroid";
+      const [w, h] = sizeOf(src);
+      fig.dataset.ratio = h / w;
       const img = new Image();
-      img.src = src;
+      img.width = w; img.height = h;
+      img.loading = "lazy";
+      img.decoding = "async";
       img.alt = caption;
+      // Small thumbnail in the grid (fast), the full photo only opens in the big view.
+      const thumb = src.replace("images/", "images/thumbs/");
+      img.src = thumb;
       img.onerror = () => {
+        if (img.src.indexOf("/thumbs/") > -1) { img.src = src; return; } // no thumbnail? use the full one
         img.replaceWith(Object.assign(document.createElement("div"), {
           className: "ph",
           innerHTML: `<div><b>📷</b>add ${src}</div>`
@@ -228,8 +242,32 @@
         if (fig.dataset.empty) return;
         open(good.findIndex((g) => g[0] === src), false);
       });
-      gallery.appendChild(fig);
+      figs.push(fig);
     });
+
+    // Masonry: put each photo in the shortest column (no CSS columns = no Safari glitches).
+    let colCount = 0;
+    function layout() {
+      const n = window.innerWidth < 900 ? 2 : 3;
+      if (n === colCount) return;
+      colCount = n;
+      gallery.innerHTML = "";
+      const cols = [], heights = [];
+      for (let c = 0; c < n; c++) {
+        const col = document.createElement("div");
+        col.className = "gallery-col";
+        gallery.appendChild(col);
+        cols.push(col); heights.push(0);
+      }
+      figs.forEach((fig) => {
+        const c = heights.indexOf(Math.min(...heights));
+        cols[c].appendChild(fig);
+        heights[c] += +fig.dataset.ratio + 0.25; // + caption
+      });
+    }
+    layout();
+    let rt;
+    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(layout, 150); });
 
     function showPhoto(k, story) {
       cur = (k + good.length) % good.length;
