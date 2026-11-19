@@ -672,3 +672,171 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.appendChild(btn);
   document.body.appendChild(pop);
 });
+
+// ---------- 🎂 Birthday (30 November) ----------
+// On her birthday the home page opens with a birthday screen + letter (every time she opens it that day).
+// From that day on, the letter also stays in Memories as a card.
+// Preview it any day by adding ?bday to the link, e.g. index.html?bday
+// ✏️ Edit the letter below.
+const BDAY = { year: 2026, month: 11, day: 30, age: 27 };
+const BDAY_LETTER = [
+  "Happy birthday, Simran. 🎂",
+  "27 years ago today, the world got a little brighter. It just didn't know yet how much.",
+  "I've been trying to write this for days. Turns out it's really hard to fit a whole person into one letter. But I'll try.",
+  "You're the girl who carries everyone else's tears and still shows up smiling. Who says \"tum mat aao, ulta route hai\" because she cares about everyone more than herself. Who goes quiet when she's thinking, and makes everything feel softer when she laughs.",
+  "I wasn't there for most of your 26 years. But I'm really glad I get to be here for this one.",
+  "So here's what I wish for you at 27:",
+  "🌷 Days that feel lighter than the ones you've carried.<br>🤍 People who hold you the way you hold everyone else.<br>😂 More laughing till your stomach hurts. Less overthinking at 2am.<br>🏍️ And a back seat that's always yours, whenever you want it.",
+  "Today you don't have to be strong. You don't have to take care of anyone. Today is just for you.",
+  "Happy birthday, pretty girl. I'm so glad you were born. 💗"
+];
+const BDAY_SIGN = "— Dhruv";
+
+function bdayPreview() { return /[?&]bday\b/.test(location.search); }
+function isBirthday() {
+  const d = new Date();
+  return bdayPreview() || (d.getMonth() + 1 === BDAY.month && d.getDate() === BDAY.day);
+}
+function birthdayStarted() {
+  return bdayPreview() || new Date() >= new Date(BDAY.year, BDAY.month - 1, BDAY.day);
+}
+
+function openBirthday() {
+  let ov = document.getElementById("bday");
+  if (!ov) {
+    ov = document.createElement("div");
+    ov.id = "bday";
+    const confetti = Array.from({ length: 46 }, () => {
+      const c = ["#ff9cb9", "#b9a3ff", "#ffd36e", "#8fe3c8", "#ffffff"][Math.floor(Math.random() * 5)];
+      return `<i style="left:${(Math.random() * 100).toFixed(1)}%;background:${c};animation-delay:-${(Math.random() * 6).toFixed(2)}s;animation-duration:${(4 + Math.random() * 4).toFixed(2)}s;transform:rotate(${Math.floor(Math.random() * 360)}deg)"></i>`;
+    }).join("");
+    const lines = BDAY_LETTER.map((p, k) => `<p style="animation-delay:${(0.3 + k * 0.45).toFixed(2)}s">${p}</p>`).join("");
+    const wa = waLink("I read my birthday letter 🥹💗");
+    ov.innerHTML = `
+      <div class="bday-confetti">${confetti}</div>
+      <button class="close-x bday-x" aria-label="Close">×</button>
+      <div class="bday-stage" id="bdStage">
+        <span class="bday-tag">30 November · ${BDAY.age} today ✨</span>
+        <h1>Happy Birthday,<br><span class="nw">Simran</span> 🎂</h1>
+        <p class="bday-sub">${BDAY.age} looks really, really good on you.</p>
+        <div class="cake" id="bdCake">
+          <div class="candles">${String(BDAY.age).split("").map((d) => `<div class="candle"><div class="flame"></div><div class="smoke"></div><span>${d}</span></div>`).join("")}</div>
+          <div class="tier top"><div class="drip"></div></div>
+          <div class="tier bottom"><div class="drip"></div><div class="sprinkles"></div></div>
+          <div class="plate"></div>
+        </div>
+        <p class="bday-wish" id="bdWish">Close your eyes. Make a wish. 🤫<br>Then blow out the candles 🌬️</p>
+        <div class="game-btns" id="bdBlowBtns"><button class="btn" id="bdMic">🎤 Blow into the mic</button><button class="btn ghost" id="bdTap">or just tap the flames</button></div>
+        <div class="bday-env-wrap" id="bdEnvWrap">
+          <div class="big-env" id="bdEnv"><div class="heart-seal">💌</div></div>
+          <p class="bday-hint">a letter for the birthday girl · tap to open</p>
+        </div>
+      </div>
+      <div class="bday-letter" id="bdLetter">
+        <div class="letter-paper">${lines}<p class="sign" style="animation-delay:${(0.3 + BDAY_LETTER.length * 0.45).toFixed(2)}s">${BDAY_SIGN}</p></div>
+        <div class="game-btns">${wa ? `<a class="btn" target="_blank" rel="noopener" href="${wa}">Text him 💬</a>` : ""}
+          <button class="btn ghost" id="bdClose">Close 🎀</button></div>
+      </div>`;
+    document.body.appendChild(ov);
+    const close = () => { ov.classList.remove("open"); document.documentElement.style.overflow = ""; if (ov._stopMic) ov._stopMic(); };
+    ov.querySelector(".bday-x").addEventListener("click", close);
+    ov.querySelector("#bdClose").addEventListener("click", close);
+    // 🕯️ Candles: tap a flame, or blow into the mic
+    let mic = null;
+    const stopMic = () => { if (mic) { mic.stream.getTracks().forEach((t) => t.stop()); mic.ctx.close(); mic = null; } };
+    ov._stopMic = stopMic;
+    function blowOut(c) {
+      if (c.classList.contains("out")) return;
+      c.classList.add("out");
+      if (navigator.vibrate) navigator.vibrate(30);
+      if (ov.querySelectorAll(".candle:not(.out)").length) return;
+      stopMic();
+      ov.querySelector("#bdBlowBtns").style.display = "none";
+      const wish = ov.querySelector("#bdWish");
+      wish.innerHTML = "Yay! 🎉 I hope every bit of that wish comes true. 💫";
+      wish.classList.add("done");
+      heartRain(3000, ["🎉", "🎈", "💗", "✨", "🎂"]);
+      setTimeout(() => {
+        ov.querySelector("#bdEnvWrap").classList.add("show");
+        ov.querySelector("#bdEnvWrap").scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 1600);
+    }
+    ov.querySelectorAll(".candle").forEach((c) => c.addEventListener("click", () => blowOut(c)));
+    ov.querySelector("#bdTap").addEventListener("click", () => {
+      ov.querySelector("#bdWish").innerHTML = "Tap each flame 🔥 (wish first! 🤫)";
+    });
+    ov.querySelector("#bdMic").addEventListener("click", async () => {
+      const btn = ov.querySelector("#bdMic");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const an = ctx.createAnalyser(); an.fftSize = 512;
+        ctx.createMediaStreamSource(stream).connect(an);
+        mic = { stream, ctx };
+        btn.textContent = "Listening… blow! 🌬️";
+        const buf = new Uint8Array(an.fftSize);
+        let loud = 0;
+        const listen = () => {
+          if (!mic) return;
+          an.getByteTimeDomainData(buf);
+          let sum = 0;
+          for (const v of buf) sum += ((v - 128) / 128) ** 2;
+          const rms = Math.sqrt(sum / buf.length);
+          loud = rms > 0.2 ? loud + 1 : Math.max(0, loud - 1);
+          if (loud > 6) { const c = ov.querySelector(".candle:not(.out)"); if (c) blowOut(c); loud = 0; }
+          requestAnimationFrame(listen);
+        };
+        listen();
+      } catch (e) {
+        btn.style.display = "none";
+        ov.querySelector("#bdWish").innerHTML = "No mic? No problem. Tap the flames 🔥";
+      }
+    });
+
+    ov.querySelector("#bdEnv").addEventListener("click", () => {
+      const env = ov.querySelector("#bdEnv");
+      if (env.classList.contains("open")) return;
+      env.classList.add("open");
+      setTimeout(() => {
+        ov.classList.add("reading");
+        ov.scrollTop = 0;
+        heartRain(2500, ["💗", "🎂", "🎈", "✨", "🌸"]);
+      }, 700);
+    });
+  }
+  // start fresh each time
+  ov.classList.remove("reading");
+  ov.querySelector("#bdEnv").classList.remove("open");
+  ov.querySelector("#bdEnvWrap").classList.remove("show");
+  ov.querySelectorAll(".candle").forEach((c) => c.classList.remove("out"));
+  ov.querySelector("#bdBlowBtns").style.display = "";
+  ov.querySelector("#bdMic").textContent = "🎤 Blow into the mic";
+  ov.querySelector("#bdMic").style.display = "";
+  const w = ov.querySelector("#bdWish");
+  w.classList.remove("done");
+  w.innerHTML = "Close your eyes. Make a wish. 🤫<br>Then blow out the candles 🌬️";
+  ov.classList.add("open");
+  document.documentElement.style.overflow = "hidden";
+  heartRain(2200, ["🎈", "🎉", "💗", "✨"]);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.body.classList.contains("stage-mode")) return;
+  // Memories: the birthday card (from 30 Nov onwards)
+  const card = document.getElementById("bdayCard");
+  if (card && birthdayStarted()) {
+    card.closest(".moment").hidden = false;
+    card.addEventListener("click", openBirthday);
+  }
+  if (!isBirthday()) return;
+  // Home: a little banner to reopen it, and the birthday screen on every open
+  const hero = document.querySelector(".hero");
+  if (hero) {
+    const b = document.createElement("button");
+    b.className = "bday-banner";
+    b.textContent = "🎂 It's your birthday! Open your letter 💌";
+    b.addEventListener("click", openBirthday);
+    hero.prepend(b);
+    afterGate(() => setTimeout(openBirthday, 600));
+  }
+});

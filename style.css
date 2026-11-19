@@ -918,3 +918,73 @@ body:has(#constellation.open) .toast { display: none; }
 #constellation .sky-heart { fill: rgba(255, 156, 185, 0.08); stroke: #ff9cb9; stroke-width: 0.9; stroke-linecap: round; filter: drop-shadow(0 0 2px #ff6f9f); transition: stroke-dashoffset 2.2s ease-in-out; }
 #constellation.done #skyLinks line { stroke: rgba(255, 209, 225, 0.25) !important; stroke-width: 0.35 !important; transition: stroke 1.5s; }
 .moment-card .moment-date { white-space: nowrap; font-size: 12px; }
+
+/* ---------- 🎂 Birthday ---------- */
+#bday {
+  position: fixed; inset: 0; z-index: 900; display: none; overflow-y: auto; overflow-x: hidden;
+  background: radial-gradient(circle at 50% 20%, #fff0f6 0%, #ffd3e2 45%, #e4d4ff 100%); color: #4a2c3a;
+  padding: 24px 16px 40px;
+}
+#bday.open { display: block; }
+body:has(#bday.open) .toast { display: none; }
+.bday-x { position: fixed; z-index: 3; }
+.bday-confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.bday-confetti i { position: absolute; top: -20px; width: 8px; height: 14px; border-radius: 2px; opacity: 0.85; animation: confettiFall linear infinite; }
+@keyframes confettiFall { to { top: 105%; transform: rotate(720deg) translateX(40px); } }
+.bday-stage { position: relative; z-index: 1; min-height: calc(100dvh - 64px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; }
+.bday-tag { display: inline-block; font-size: 13px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--pink), var(--lav)); padding: 5px 14px; border-radius: 999px; }
+.bday-stage h1 { font-family: "Caveat", cursive; font-size: clamp(48px, 12vw, 84px); line-height: 1; color: var(--pink-deep); margin: 6px 0 0; text-shadow: 0 4px 20px rgba(255, 120, 160, 0.35); animation: pop 0.8s cubic-bezier(.3,1.6,.5,1); }
+.bday-stage .nw { white-space: nowrap; }
+.bday-sub { font-size: 18px; font-weight: 600; margin: 0 0 18px; color: #7a4d62; }
+#bday .big-env { margin-top: 6px; }
+.bday-hint { color: #8a6878; font-weight: 600; font-size: 14px; margin: 14px 0 0; }
+#bday.reading .bday-stage { display: none; }
+.bday-letter { display: none; position: relative; z-index: 1; max-width: 640px; margin: 30px auto 0; }
+#bday.reading .bday-letter { display: block; animation: pop 0.6s; }
+.bday-letter .letter-paper { max-height: none; animation: none; color: #4a2c3a; }
+.bday-letter .letter-paper > p { opacity: 0; animation: lineIn 0.9s ease forwards; }
+.bday-letter .letter-paper > p:first-child { font-family: "Caveat", cursive; font-size: 34px; color: var(--pink-deep); line-height: 1.2; }
+.bday-banner {
+  border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 18px;
+  background: linear-gradient(135deg, var(--pink), var(--lav)); padding: 10px 18px; border-radius: 999px; box-shadow: var(--shadow);
+  animation: heartbeat 2.4s ease-in-out infinite;
+}
+.bday-card { background-color: #fff3f8 !important; }
+
+/* 🎂 cake + candles */
+.bday-stage { justify-content: flex-start; padding-top: 10px; }
+.bday-sub { margin-bottom: 6px; }
+.cake { position: relative; width: 230px; margin: 64px auto 0; }
+.candles { position: absolute; bottom: 100%; left: 0; right: 0; display: flex; justify-content: center; gap: 26px; margin-bottom: -6px; z-index: 2; }
+.candle { position: relative; width: 44px; height: 58px; cursor: pointer; display: grid; place-items: center; border-radius: 10px 10px 4px 4px;
+  background: repeating-linear-gradient(135deg, #ff9cb9 0 8px, #ffd3e0 8px 16px); box-shadow: inset 0 -4px 0 rgba(0,0,0,0.06); }
+.candle:nth-child(2) { background: repeating-linear-gradient(135deg, #b9a3ff 0 8px, #e4dbff 8px 16px); }
+.candle span { font-family: "Caveat", cursive; font-weight: 700; font-size: 34px; color: #fff; text-shadow: 0 2px 4px rgba(150, 50, 90, 0.5); line-height: 1; }
+.candle::before { content: ""; position: absolute; bottom: 100%; left: 50%; width: 2px; height: 9px; background: #5a3a3a; transform: translateX(-50%); }
+.flame { position: absolute; bottom: calc(100% + 6px); left: 50%; width: 16px; height: 28px; margin-left: -8px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 75%, #fff 0 18%, #ffe066 35%, #ff9a3c 70%, rgba(255, 120, 40, 0) 72%);
+  box-shadow: 0 0 22px 8px rgba(255, 190, 80, 0.55); transform-origin: 50% 90%; animation: flicker 0.18s ease-in-out infinite alternate; transition: opacity 0.25s, transform 0.25s; }
+@keyframes flicker { from { transform: rotate(-3deg) scaleY(1); } to { transform: rotate(3deg) scaleY(1.08); } }
+.candle.out .flame { opacity: 0; transform: scaleY(0.2); animation: none; }
+.smoke { position: absolute; bottom: calc(100% + 10px); left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: rgba(160, 150, 160, 0.6); opacity: 0; pointer-events: none; }
+.candle.out .smoke { animation: smokeUp 1.6s ease-out forwards; }
+@keyframes smokeUp { 0% { opacity: 0.8; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) translateX(10px) scale(3); } }
+.tier { position: relative; margin: 0 auto; border-radius: 14px 14px 8px 8px; }
+.tier.top { width: 170px; height: 62px; background: linear-gradient(#fff6fa, #ffe1ec); z-index: 1; }
+.tier.bottom { width: 230px; height: 80px; margin-top: -4px; background: linear-gradient(#ffc2d6, #ff9cb9); }
+.drip { position: absolute; top: 0; left: 0; right: 0; height: 22px; border-radius: 14px 14px 0 0;
+  background: radial-gradient(circle at 10% 100%, transparent 0 0, #fff 0) top / 100% 12px no-repeat,
+    radial-gradient(circle 9px at 50% 0, #fff 98%, transparent) 0 8px / 26px 18px repeat-x; }
+.tier.top .drip { background: radial-gradient(circle at 10% 100%, transparent 0 0, #ff9cb9 0) top / 100% 12px no-repeat, radial-gradient(circle 9px at 50% 0, #ff9cb9 98%, transparent) 0 8px / 26px 18px repeat-x; }
+.sprinkles { position: absolute; inset: 30px 14px 10px; background:
+  radial-gradient(circle, #b9a3ff 2px, transparent 2.5px) 0 0 / 26px 20px,
+  radial-gradient(circle, #ffd36e 2px, transparent 2.5px) 13px 10px / 26px 20px; opacity: 0.9; }
+.plate { width: 270px; height: 14px; margin: -2px auto 0; border-radius: 50%; background: #fff; box-shadow: 0 8px 18px rgba(200, 90, 130, 0.25); position: relative; left: -20px; }
+.bday-wish { font-family: "Caveat", cursive; font-size: 27px; line-height: 1.25; color: #7a4d62; margin: 18px 0 0; min-height: 2.5em; }
+.bday-wish.done { color: var(--pink-deep); animation: pop 0.6s cubic-bezier(.3,1.6,.5,1); }
+#bday .game-btns { margin-top: 8px; }
+#bday .btn.ghost { color: var(--pink-deep); }
+.bday-env-wrap { display: none; flex-direction: column; align-items: center; margin-top: 26px; }
+.bday-env-wrap.show { display: flex; animation: pop 0.7s cubic-bezier(.3,1.6,.5,1); }
+.moment[hidden] { display: none !important; }
+.moments { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
