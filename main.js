@@ -828,6 +828,26 @@ document.addEventListener("DOMContentLoaded", () => {
     card.closest(".moment").hidden = false;
     card.addEventListener("click", openBirthday);
   }
+  // Home: countdown to her birthday (until 30 Nov). At midnight the page reloads into birthday mode.
+  const heroC = document.querySelector(".hero");
+  if (heroC && !birthdayStarted()) {
+    const target = new Date(BDAY.year, BDAY.month - 1, BDAY.day);
+    const b = document.createElement("button");
+    b.className = "bday-count";
+    heroC.prepend(b);
+    const pad = (x) => String(x).padStart(2, "0");
+    const tick = () => {
+      const ms = target - new Date();
+      if (ms <= 0) { b.textContent = "🎂 It's time…"; setTimeout(() => location.reload(), 1200); return; }
+      const sec = Math.floor(ms / 1000), d = Math.floor(sec / 86400), h = Math.floor(sec / 3600) % 24, m = Math.floor(sec / 60) % 60, x = sec % 60;
+      b.innerHTML = `<small>🎂 your birthday in</small><b>${d ? d + (d === 1 ? " day " : " days ") : ""}${pad(h)}:${pad(m)}:${pad(x)}</b><small>something's waiting for you 🔒</small>`;
+      setTimeout(tick, 1000);
+    };
+    tick();
+    const teases = ["Not yet 😏", "Patience, birthday girl 🎀", "Nope. No spoilers. 🤐", "Locked till the 30th 🔒", "Trying to peek? Cute. Still no. 😌"];
+    let t = 0;
+    b.addEventListener("click", () => { toast(teases[t++ % teases.length]); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); });
+  }
   if (!isBirthday()) return;
   // Home: a little banner to reopen it, and the birthday screen on every open
   const hero = document.querySelector(".hero");
