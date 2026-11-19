@@ -999,3 +999,56 @@ body:has(#bday.open) .toast { display: none; }
 .bday-count b { font-size: 24px; color: var(--pink-deep); font-variant-numeric: tabular-nums; letter-spacing: 0.5px; }
 .bday-count.shake { animation: glitch 0.4s steps(2) 1; }
 body.night .bday-count { background: rgba(42, 27, 69, 0.75); border-color: rgba(255, 156, 185, 0.5); }
+.bday-letter .letter-paper b { color: var(--pink-deep); font-family: "Caveat", cursive; font-size: 1.45em; font-weight: 700; }
+
+/* 🎉 Birthday party mode (30 Nov) */
+.party-hat {
+  position: absolute; top: -46px; left: 50%; width: 62px; height: 74px; z-index: 3; margin-left: -6px;
+  transform: rotate(14deg); transform-origin: 50% 100%; pointer-events: none;
+  background: repeating-linear-gradient(135deg, #ff9cb9 0 10px, #fff 10px 16px, #b9a3ff 16px 26px, #fff 26px 32px);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+  animation: hatWiggle 3s ease-in-out infinite;
+}
+@keyframes hatWiggle { 0%, 100% { transform: rotate(14deg); } 50% { transform: rotate(8deg); } }
+body.bday-mode .photo-ring { overflow: visible; }
+body.bday-mode .photo-ring::after { background: conic-gradient(#ffd36e, var(--pink), var(--lav), #8fe3c8, #ffd36e); opacity: 0.7; }
+body.bday-mode nav .logo { background: linear-gradient(90deg, var(--pink-deep), #b07cff, var(--pink-deep)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+body.bday-mode::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.5;
+  background:
+    radial-gradient(circle, #ffd36e 2px, transparent 2.5px) 0 0 / 90px 90px,
+    radial-gradient(circle, #b9a3ff 2px, transparent 2.5px) 45px 30px / 90px 90px,
+    radial-gradient(circle, #8fe3c8 2px, transparent 2.5px) 20px 60px / 90px 90px;
+}
+
+/* ✨ Wish jar */
+.wish-jar { margin: 26px auto 0; max-width: 520px; text-align: center; background: rgba(255,255,255,0.75); border-radius: 22px; padding: 22px 18px; box-shadow: var(--shadow); }
+.wish-jar h3 { font-family: "Caveat", cursive; font-size: 32px; color: var(--pink-deep); margin: 6px 0 4px; }
+.wish-jar p { margin: 0 0 12px; color: #7a4d62; font-size: 15px; line-height: 1.5; }
+.wish-jar textarea { width: 100%; border: 2px solid #ffd0de; border-radius: 14px; padding: 12px 14px; font: inherit; font-size: 16px; color: #4a2c3a; background: #fffdf8; resize: vertical; margin-bottom: 12px; outline: none; }
+.wish-jar textarea:focus { border-color: var(--pink); }
+.wish-jar textarea.shake { animation: glitch 0.4s steps(2) 1; border-color: var(--pink-deep); }
+.wish-done { font-weight: 700; color: var(--pink-deep) !important; min-height: 1.3em; margin: 12px 0 0 !important; }
+.jar { position: relative; width: 70px; height: 86px; margin: 0 auto; }
+.jar-lid { position: absolute; top: 0; left: 10px; right: 10px; height: 12px; border-radius: 4px; background: linear-gradient(#d9a76a, #b98447); }
+.jar-glass { position: absolute; top: 10px; left: 0; right: 0; bottom: 0; border-radius: 14px 14px 18px 18px; background: rgba(230, 240, 255, 0.55); border: 2px solid rgba(180, 190, 220, 0.8); overflow: hidden; }
+.jar-glass i { position: absolute; bottom: 8px; width: 10px; height: 10px; border-radius: 50%; background: #ffd36e; box-shadow: 0 0 10px #ffd36e; animation: twinkle 2s ease-in-out infinite; }
+.jar-glass i:nth-child(1) { left: 12px; } .jar-glass i:nth-child(2) { left: 30px; bottom: 22px; background: #ff9cb9; box-shadow: 0 0 10px #ff9cb9; animation-delay: .6s; } .jar-glass i:nth-child(3) { left: 46px; animation-delay: 1.2s; }
+.wish-paper { position: absolute; top: -40px; left: 50%; font-size: 22px; transform: translateX(-50%); opacity: 0; }
+.wish-jar.dropped .wish-paper { animation: wishDrop 1s ease-in forwards; }
+@keyframes wishDrop { 0% { opacity: 1; top: -60px; } 70% { opacity: 1; top: 40px; } 100% { opacity: 0; top: 50px; } }
+.wish-jar.dropped .jar { animation: jarShake 0.5s 0.8s ease-in-out; }
+@keyframes jarShake { 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+
+/* Open When: keep the seal above the label, even for two-line labels */
+.envelope { height: 178px; padding-bottom: 16px; }
+.envelope::before { height: 74px; }
+.envelope .seal { top: 50px; width: 42px; height: 42px; font-size: 18px; }
+.envelope span { font-size: 23px; line-height: 1.15; min-height: 2.3em; display: flex; align-items: center; }
+@media (max-width: 560px) {
+  .env-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .envelope { height: 148px; padding: 0 4px 12px; }
+  .envelope::before { height: 60px; }
+  .envelope .seal { top: 38px; width: 36px; height: 36px; font-size: 16px; }
+  .envelope span { font-size: 18px; padding: 0 4px; }
+}

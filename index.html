@@ -100,7 +100,13 @@
 
   <script src="main.js"></script>
   <script>
-    const lines = [
+    const bdayLines = [
+      "Today isn't just any day…",
+      "It's YOUR day. 🎂",
+      "Happy birthday, Simran. 27 never looked this good. ✨",
+      "Oh, and one more thing…\nI love you, Simran. 💗"
+    ];
+    const lines = (typeof isBirthday === "function" && isBirthday()) ? bdayLines : [
       "This little website exists for one reason…",
       "to remind you that you're seriously special. 🌷",
       "Bad days don't last. But you? You're staying awesome.",

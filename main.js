@@ -76,7 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const floaties = document.createElement("div");
   floaties.id = "floaties";
   document.body.prepend(floaties);
-  const icons = ["💗", "🌸", "✨", "💕", "🌷", "🦋", "☁️", "💖"];
+  const icons = isBirthday()
+    ? ["🎈", "🎉", "🎂", "🎁", "✨", "🎈", "🎀", "💗", "🎊"]
+    : ["💗", "🌸", "✨", "💕", "🌷", "🦋", "☁️", "💖"];
   function spawnFloaty() {
     const el = document.createElement("span");
     el.className = "floaty";
@@ -688,6 +690,10 @@ const BDAY_LETTER = [
   "So here's what I wish for you at 27:",
   "🌷 Days that feel lighter than the ones you've carried.<br>🤍 People who hold you the way you hold everyone else.<br>😂 More laughing till your stomach hurts. Less overthinking at 2am.<br>🏍️ And a back seat that's always yours, whenever you want it.",
   "Today you don't have to be strong. You don't have to take care of anyone. Today is just for you.",
+  "And since it's your day, let me say it properly. No jokes, no hiding behind emojis:",
+  "<b>I love you, Simran.</b> I love you right now, at 27, exactly the way you are. The quiet you, the laughing you, the overthinking-at-2am you. All of you.",
+  "And I'll keep loving you. At 28, at 30, at 50, on every birthday after this one. Through the good days and the hard ones. That part isn't changing. Not ever.",
+  "Whatever this year brings, you'll always have me. Always. 🤍",
   "Happy birthday, pretty girl. I'm so glad you were born. 💗"
 ];
 const BDAY_SIGN = "— Dhruv";
@@ -734,7 +740,15 @@ function openBirthday() {
       </div>
       <div class="bday-letter" id="bdLetter">
         <div class="letter-paper">${lines}<p class="sign" style="animation-delay:${(0.3 + BDAY_LETTER.length * 0.45).toFixed(2)}s">${BDAY_SIGN}</p></div>
-        <div class="game-btns">${wa ? `<a class="btn" target="_blank" rel="noopener" href="${wa}">Text him 💬</a>` : ""}
+        <div class="wish-jar" id="wishJar">
+          <div class="jar"><span class="jar-lid"></span><div class="jar-glass"><i></i><i></i><i></i></div><span class="wish-paper" id="wishPaper">✨</span></div>
+          <h3>The birthday wish jar ✨</h3>
+          <p>Write down one wish. Big, small, silly, anything. It goes straight to me, and I'll try my very best to make it come true. 🤍</p>
+          <textarea id="wishText" rows="3" maxlength="300" placeholder="I wish…"></textarea>
+          <a class="btn" id="wishSend" target="_blank" rel="noopener">Drop it in the jar ✨</a>
+          <p class="wish-done" id="wishDone"></p>
+        </div>
+        <div class="game-btns">${wa ? `<a class="btn ghost" target="_blank" rel="noopener" href="${wa}">Text him 💬</a>` : ""}
           <button class="btn ghost" id="bdClose">Close 🎀</button></div>
       </div>`;
     document.body.appendChild(ov);
@@ -793,6 +807,27 @@ function openBirthday() {
       }
     });
 
+    // ✨ Wish jar: the wish goes to WhatsApp
+    const wishText = ov.querySelector("#wishText"), wishSend = ov.querySelector("#wishSend");
+    const setWish = () => {
+      const t = wishText.value.trim();
+      const url = t && waLink(`My birthday wish 🎂✨\n\n${t}`);
+      if (url) wishSend.href = url; else wishSend.removeAttribute("href");
+    };
+    wishText.addEventListener("input", setWish);
+    wishSend.addEventListener("click", (e) => {
+      if (!wishText.value.trim()) {
+        e.preventDefault();
+        wishText.classList.remove("shake"); void wishText.offsetWidth; wishText.classList.add("shake");
+        wishText.focus();
+        return;
+      }
+      const jar = ov.querySelector("#wishJar");
+      jar.classList.remove("dropped"); void jar.offsetWidth; jar.classList.add("dropped");
+      ov.querySelector("#wishDone").textContent = "Wish received. 🤍 Now it's my job.";
+      heartRain(1800, ["✨", "⭐", "💫", "🤍"]);
+    });
+
     ov.querySelector("#bdEnv").addEventListener("click", () => {
       const env = ov.querySelector("#bdEnv");
       if (env.classList.contains("open")) return;
@@ -849,6 +884,27 @@ document.addEventListener("DOMContentLoaded", () => {
     b.addEventListener("click", () => { toast(teases[t++ % teases.length]); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); });
   }
   if (!isBirthday()) return;
+
+  // 🎉 Party mode: the whole site dresses up for the day
+  document.body.classList.add("bday-mode");
+  document.title = "🎂 " + document.title;
+  const logoEl = document.querySelector(".logo");
+  if (logoEl) logoEl.innerHTML = logoEl.innerHTML.replace("for Simran", "birthday girl");
+  const ring = document.querySelector(".photo-ring");
+  if (ring) ring.insertAdjacentHTML("beforeend", '<span class="party-hat"></span>');
+  // ✏️ One birthday toast per page
+  const PAGE_TOASTS = {
+    "reasons.html": "Reason #∞: you were born today. 🎂",
+    "memories.html": "Making a new memory today? 😌🎈",
+    "openwhen.html": "Open when… it's your birthday. (That's now. 🎂)",
+    "smile.html": "Birthday smile check: 😁 required.",
+    "quiz.html": "Birthday girls get bonus points. 🎀",
+    "gifts.html": "Psst… birthday gifts never expire. 🎁",
+    "letter.html": "Two letters in one day? Spoiled. 💌"
+  };
+  const pg = location.pathname.split("/").pop() || "index.html";
+  if (PAGE_TOASTS[pg]) afterGate(() => setTimeout(() => toast(PAGE_TOASTS[pg], 4500), 4500));
+
   // Home: a little banner to reopen it, and the birthday screen on every open
   const hero = document.querySelector(".hero");
   if (hero) {
